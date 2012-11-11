@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-
+package main;
 use strict;
 use warnings;
 use DBI;

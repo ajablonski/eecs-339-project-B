@@ -3,13 +3,9 @@
 use strict;
 
 use CGI qw(:standard);
-
-use DBI;
-
+use user;
+use convenience;
 require "sql.pl";
-
-my $dbuser="amj650";
-my $dbpasswd="z40wkjgIK";
 
 my $run;
 my $action;
@@ -20,7 +16,6 @@ if (defined(param("act"))) {
 } else {
     $action = "register";
 }
-
 
 
 if (defined(param("run"))) {
@@ -39,7 +34,7 @@ if ($action eq "register") {
         my $password = param('password');
         my $key = int(rand(10000000));
         my $sqlString = '';
-        $sqlString .= "INSERT INTO amj650.users (email, password, validation_code) ";
+        $sqlString .= "INSERT INTO $netID.users (email, password, validation_code) ";
         $sqlString .= " VALUES (?, ?, ?) ";
         my $error;
         eval {
@@ -52,7 +47,7 @@ if ($action eq "register") {
             my $subject = "'Registration for Portfolio Manager'";
             my $content = '';
             $content .= "Follow this link to confirm your registration: \n";
-            $content .= "http://murphy.wot.eecs.northwestern.edu/~amj650/portfolio/";
+            $content .= "http://murphy.wot.eecs.northwestern.edu/~$netID/portfolio/";
             $content .= "register.pl?act=confirm&key=$key";
 
             open(MAIL, "| mail -s $subject $email") or die "Can't run mail\n";
@@ -62,6 +57,7 @@ if ($action eq "register") {
             print "Email successfully sent.", p;
             print   a({href=>"login.pl"}, "Return to login page");
         } else {
+            print $error;
             $registerComplain = 1;
             $run = 0;
         }
@@ -83,7 +79,7 @@ if ($action eq "register") {
     my $key = param('key');
 
     my $sqlString = '';
-    $sqlString .= "UPDATE amj650.users SET validation_code=NULL WHERE validation_code = ?";
+    $sqlString .= "UPDATE $netID.users SET validation_code=NULL WHERE validation_code = ?";
     local $@;
     my $error = undef;
     eval {

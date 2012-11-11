@@ -4,6 +4,7 @@ use strict;
 
 use CGI qw(:standard);
 
+use user;
 use convenience;
 use DBI;
 

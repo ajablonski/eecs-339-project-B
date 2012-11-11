@@ -1,9 +1,7 @@
 #!/usr/bin/perl -w
 package convenience;
 our @ISA = 'Exporter';
-our @EXPORT = qw(   $dbuser 
-                    $dbpasswd 
-                    $loginCookieName
+our @EXPORT = qw(   $loginCookieName
                     redirectIfNotLoggedIn
                     getCurrentUser
                     );
@@ -13,11 +11,10 @@ use strict;
 use Exporter;
 use CGI qw(:standard);
 use DBI;
+use user;
 
 require "sql.pl";
 
-our $dbuser = "amj650";
-our $dbpasswd="z40wkjgIK";
 our $loginCookieName="portfolioLogin";
 
 sub redirectIfNotLoggedIn {
@@ -30,11 +27,11 @@ sub redirectIfNotLoggedIn {
         my ($email, $password) = split(/\//, $loginCookieIn);
 
         my $sqlString = '';
-        $sqlString .= "SELECT COUNT(*) FROM amj650.users ";
+        $sqlString .= "SELECT COUNT(*) FROM $netID.users ";
         $sqlString .= "WHERE email = ? AND password = ? AND validation_code IS NULL ";
         my @row;
         eval {
-            @row = ExecSQL($dbuser, $dbpasswd, $sqlString, 'ROW', $email, $password);
+            @row = ::ExecSQL($dbuser, $dbpasswd, $sqlString, 'ROW', $email, $password);
         };
         my $error = $@;
 

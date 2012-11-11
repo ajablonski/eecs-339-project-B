@@ -3,13 +3,10 @@
 use strict;
 
 use CGI qw(:standard);
-
 use DBI;
-
+use user;
+use convenience;
 require "sql.pl";
-
-my $dbuser="amj650";
-my $dbpasswd="z40wkjgIK";
 
 my $loginCookieName="portfolioLogin";
 
@@ -31,7 +28,7 @@ if (defined(param("run"))) {
 
 if ($run) {
     my $sqlString = '';
-    $sqlString .= "SELECT COUNT(*) FROM amj650.users ";
+    $sqlString .= "SELECT COUNT(*) FROM $netID.users ";
     $sqlString .= " WHERE email = ? ";
     $sqlString .= " AND password = ? ";
     my $email = param("email");
