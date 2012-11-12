@@ -16,3 +16,4 @@ CREATE TABLE holdings (
   stock char(16) not null references cs339.stockssymbols(SYMBOL),
   numShares int not null CHECK (numShares > 0)
 );
+-- SQL is fun
