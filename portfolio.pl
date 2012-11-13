@@ -19,7 +19,7 @@ print   header,
                              Link({ -rel=>"stylesheet",
                                     -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap.css" })
                             ],
-                    -style=>{'src'=>'style.css'}
+                    -style=>{'src'=>'portfolio.css'}
                             ),
         "\n\n";
 
@@ -115,12 +115,34 @@ print   div({-class=>'navbar'}, "You are logged in as " . getCurrentUser()), "\n
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
             ), "\n\n",
+        ); # End portfolio actions
 
-
-
+print   div({-class=>"container"},
+            h1("Portfolio view: [[Portfolio name]]"),
+            h2("Portfolio statistics"),
+            ul(
+                li(u("For all stocks:"),
+                    ul(
+                        li("Covariance/correlation matrix of the stocks in the portfolio")
+                    )
+                ),
+                li(u("For each stock:"),
+                    ul(
+                        li("Coefficient of variation of each stock"),
+                        li("The Beta of each stock.")
+                    )
+                ),
+                br,
+                li("The volatility of the stocks in the portfolio"),
+                li("The correlation of the stocks in the portfolio")
+            ),
+            hr,
+            h2("List of Stock Holdings"),
+            ul({-class=>"stock-holdings"},
+   
+            )
 
         );
-
 
 print   '<script src="http://twitter.github.com/bootstrap/assets/js/jquery.js" /> </script>',
         '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"> </script>',
