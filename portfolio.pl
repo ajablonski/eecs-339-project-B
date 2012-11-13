@@ -1,81 +1,133 @@
 #!/usr/bin/perl -w
 
-#
-#
-# portfolio.pl
-#----------------------------------------------------------------------------------
-# EECS 339: Databases
-# Fall 2012, Dinda
-#
-# Lizz Bartos - eab879
-# Stephen Duraski - sjd842
-# Alex Jablonski -
-#----------------------------------------------------------------------------------
-#
-# Example code for EECS 339, Northwestern University
-#
-#
-#
+use strict;
 
-#
-# BASE
-#
-# The base action presents the overall page to the browser
-#
-#
-#
-if ($action eq "base") {
-    
-    
+use CGI qw(:standard);
 
-    #
-    # The Javascript portion of our app
-    #
-    #print "<script type=\"text/javascript\" src=\"rwb.js\"> </script>";
-    
-    
-    #
-    # User mods
-    #
-    #
-    #if ($user eq "anon") {
-    #    print "<p>You are anonymous, but you can also <a href=\"rwb.pl?act=login\">login</a></p>";
-    #}
-    #else {
-        # for other users, display links to things they have permission to do
-    #   print "<p>You are logged in as $user and can do the following:</p>";
-    # if (UserCan($user,"give-opinion-data")) {
-    #       print "<a href=\"rwb.pl?act=give-opinion-data\" width=40px\">Give Opinion Of Current Location</a> <br/>";
-            #}
-        
-    #  if (UserCan($user,"manage-users") || UserCan($user,"add-users")) {
-    #       print "<a href=\"portfolio.pl?act=add-user\">Add User</a> <br/>";
-    #   }
-       
-    #   print "<p><a href=\"portfolio.pl?act=logout&run=1\">Logout</a></p>";
-    #}
-    
-    if ($user) {
-        print "<p> Hello, $user. You are logged in.";
-        print "<br/> <a href='#'>Log out</a></p>";
-    }
-    
-    else {
-        print "<p>You are anonymous, but you can also <a href=\"rwb.pl?act=login\">login</a></p>";
-    }
-    
+use user;
+use common;
+use DBI;
 
-    #
-    # The Sidebar Div, which displays actions the user can do
-    #
-    print "<div id='sidebar'>";
-    
+require "sql.pl";
 
-    
-    
+redirectIfNotLoggedIn();
 
-    
-    
-    print "</div>"; # end the sidebar div
-    
-}
+print   header,
+        start_html( -title=>'Home',
+                    -head=>[ Link({ -rel=>"stylesheet",
+                                    -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css"}),
+                             Link({ -rel=>"stylesheet",
+                                    -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap.css" })
+                            ],
+                    -style=>{'src'=>'style.css'}
+                            ),
+        "\n\n";
+
+
+print   div({-class=>'navbar'}, "You are logged in as " . getCurrentUser()), "\n",
+
+        div({-class=>'portfolio-actions sidebar'}, "\n",
+            h2("Estimated present market value of the portfolio: "),
+            h2("Total amount of cash / cash account: "),
+            h3("Actions"), "\n",
+
+            a({ -class=>"btn btn-primary btn-small action-btn accordion-toggle",
+                -'data-toggle'=>"collapse", -href=>"#deposit"}, 
+                "Deposit cash to the cash account",
+                '<i class="icon-chevron-down icon-white" style="float: right"></i>',
+            ), "\n",
+            
+            div({-id=>"deposit", -class=>"collapse"}, "\n",
+                start_form({-class=>"form-inline"}), "\n",
+                    "Amount to deposit",
+                    '<input type="number" id="inputDeposit" min="0.01" step="0.01">',
+                    submit({-class=>"btn btn-success"}, "Submit"),
+                end_form
+            ), "\n\n",
+
+            
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
+                -'data-toggle'=>"collapse", -href=>"#withdraw"}, 
+                "Withdraw cash from cash account",
+                '<i class="icon-chevron-down icon-white" style="float: right"></i>',
+            ), "\n",
+
+            div({-id=>"withdraw", -class=>"collapse"}, "\n",
+                start_form({-class=>"form-inline"}), "\n",
+                    "Amount to withdraw",
+                    '<input type="number" id="inputWithdraw" min="0.01" step="0.01">',
+                    submit({-class=>"btn btn-success"}, "Submit"),
+                end_form
+            ), "\n\n",
+
+            
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
+                -'data-toggle'=>"collapse", -href=>"#bought"}, 
+                "Record stocks bought.",
+                '<i class="icon-chevron-down icon-white" style="float: right"></i>',
+            ), "\n",
+
+            div({-id=>"bought", -class=>"collapse"}, "\n",
+                "Which stocks
+                how many
+                for what price
+                submit",
+                start_form({-class=>"form-inline"}), "\n",
+                    "Stocks bought",
+                    '<input type="text" id="inputStockBought">', br,
+                    "# of stocks",
+                    '<input type="number" id="inputNumBought">', br,
+                    "Buying price",
+                    '<input type="number" id="inputPriceBought" min="0.01" step="0.01">', br,
+                    submit({-class=>"btn btn-success"}, "Submit"),
+                end_form
+            ), "\n\n",
+
+
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
+                -'data-toggle'=>"collapse", -href=>"#sold"}, 
+                "Record stocks sold.",
+                '<i class="icon-chevron-down icon-white" style="float: right"></i>',
+            ), "\n",
+
+            div({-id=>"sold", -class=>"collapse"}, "\n",
+                start_form({-class=>"form-inline"}), "\n",
+                    "Stocks sold",
+                    '<input type="text" id="inputStockBought">', br,
+                    "# of stocks",
+                    '<input type="number" id="inputNumBought">', br,
+                    "Selling price",
+                    '<input type="number" id="inputPriceBought" min="0.01" step="0.01">', br,
+                    submit({-class=>"btn btn-success"}, "Submit"),
+                end_form
+            ), "\n\n",
+
+
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
+                -'data-toggle'=>"collapse", -href=>"#newDailyInfo"}, 
+                "Record new stock data.",
+                '<i class="icon-chevron-down icon-white" style="float: right"></i>',
+            ), "\n",
+
+            div({-id=>"newDailyInfo", -class=>"collapse"}, "\n",
+                start_form({-class=>"form-inline"}), "\n",
+                    "Stock, high, low, start, end, ...",
+                    submit({-class=>"btn btn-success"}, "Submit"),
+                end_form
+            ), "\n\n",
+
+
+
+
+        );
+
+
+print   '<script src="http://twitter.github.com/bootstrap/assets/js/jquery.js" /> </script>',
+        '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"> </script>',
+        '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"> </script>',
+        '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-transition.js"> </script>';
+
+
+
+print   end_html;
+

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-package convenience;
+package common;
 our @ISA = 'Exporter';
 our @EXPORT = qw(   $loginCookieName
                     redirectIfNotLoggedIn

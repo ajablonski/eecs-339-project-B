@@ -27,7 +27,7 @@ use CGI qw(:standard);
 # Oracle.
 use DBI;
 use user;
-use convenience;
+use common;
 require "sql.pl";
 
 
@@ -147,7 +147,6 @@ if ($run and ($action eq "register")) {
 	    $email, $password, $key);
     };
     $error = $@;
-    
     if (!$error) {
         my $subject = "'Registration for Portfolio Manager'";
         my $content = '';
@@ -163,6 +162,7 @@ if ($run and ($action eq "register")) {
         print   a({href=>"login.pl"}, "Return to login page");
     } else {
         $registerComplain = 1;
+        $action = 'login';
         $run = 0;
     }
 }
