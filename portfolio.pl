@@ -14,6 +14,28 @@ redirectIfNotLoggedIn();
 
 my @cookies = refreshCookies();
 
+my $action = param('act');
+my $run = param('run');
+my $portID = param('portID');
+my $error;
+
+if (defined($action) and defined($run) and $run) {
+    if ($action eq 'deposit') {
+        my $amount = param('amount');
+        eval {
+            ExecSQL($dbuser, $dbpasswd, "UPDATE $netID.portfolios SET cashAccount = cashAccount + ? WHERE id = ?", undef, $amount, $portID);
+        };
+        $error = $@;
+    } elsif ($action eq 'withdraw') {
+        my $amount = param('amount');
+        eval {
+            ExecSQL($dbuser, $dbpasswd, "UPDATE $netID.portfolios SET cashAccount = cashAccount - ? WHERE id = ?", undef, $amount, $portID);
+        };
+        print $@;
+        $error = $@;
+    }
+}
+
 print   header(-cookies=>\@cookies),
         start_html( -title=>'Portfolio View',
                     -head=>[ Link({ -rel=>"stylesheet",
@@ -32,8 +54,9 @@ print   div({-class=>'navbar'},
             a({href=>"home.pl"}, "Return to list of portfolios")
         ), "\n";
 
-my $portID = param('portID');
-my $error;
+# From work done before page began
+print $error if $error;
+
 my @portfolioInfo;
 
 eval {
@@ -67,7 +90,10 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             div({-id=>"deposit", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
                     "Amount to deposit",
-                    '<input type="number" id="inputDeposit" min="0.01" step="0.01">',
+                    '<input type="number" name="amount" id="inputDeposit" min="0.01" step="0.01">',
+                    hidden(-name=>'run', -value=>1, -override=>1),
+                    hidden(-name=>'act', -value=>'deposit', -override=>1),
+                    hidden(-name=>'portID', -value=>$portID, -override=>1),
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
             ), "\n\n",
@@ -82,7 +108,10 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             div({-id=>"withdraw", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
                     "Amount to withdraw",
-                    '<input type="number" id="inputWithdraw" min="0.01" step="0.01">',
+                    '<input type="number" name="amount" id="inputWithdraw" min="0.01" step="0.01">',
+                    hidden(-name=>'run', -value=>1, -override=>1),
+                    hidden(-name=>'act', -value=>'withdraw', -override=>1),
+                    hidden(-name=>'portID', -value=>$portID, -override=>1),
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
             ), "\n\n",
