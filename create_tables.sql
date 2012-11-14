@@ -14,9 +14,10 @@ CREATE TABLE portfolios (
 
 -- individual stock holdings for a specific portfolio
 CREATE TABLE holdings (
-  portfolioID int REFERENCES portfolios(id),
+  portfolioID int REFERENCES portfolios(id) ON DELETE CASCADE,
   stock char(16) NOT NULL REFERENCES cs339.stockssymbols(symbol),
-  numShares int NOT NULL CHECK (numShares > 0)
+  numShares int NOT NULL CHECK (numShares > 0),
+  UNIQUE(portfolioID, stock)
 );
 
 CREATE SEQUENCE portfolioID;

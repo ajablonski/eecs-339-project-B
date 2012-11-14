@@ -18,10 +18,20 @@ my @cookies = refreshCookies();
 my $currentUser = getCurrentUser();
 
 print   header(-cookies=>\@cookies),
-        start_html('Home'),
+        start_html( -title=>"Home",
+                    -head=>[ Link({ -rel=>"stylesheet",
+                                    -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css"}),
+                             Link({ -rel=>"stylesheet",
+                                    -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap.css" })
+                            ],
+                    -style=>{'src'=>'portfolio.css'}
+        ),
+        "\n\n";
         h1('Home');
 
-print "Hello, " . $currentUser, p;
+print   div({-class=>'navbar'}, 
+            "You are logged in as " . getCurrentUser(), p, "\n",
+        ), "\n";
 
 my @portTable;
 
@@ -33,28 +43,28 @@ eval {
 my $error = $@;
 
 # Print portfolio table
-print   "<table>"; 
+print   h1("Portfolios");
+print   "<table border=\"1\">"; 
 print   Tr(
             th(['Portfolio name', 'Cash amount'])
         );
 foreach my $row (@portTable)
 {
-    print "<tr>";
     my $portID = @$row[0];
-    foreach my $datum (@$row[1,2])
-    {
-        print   td(
+    print   Tr(
+                td([
                     a({href=>"portfolio.pl?portID=$portID"},
-                        $datum
-                    )
-                );
-    }
-    print "</tr>";
+                        @$row[1]
+                    ),
+                    sprintf("\$%10.2f", @$row[2])
+                ])
+            );
 }
+
 print   "</table>"; 
 
 
-print   a({-href=>"portfolio.pl"}, "Portfolio view template"), p,
+print   
         a({-href=>"stockView.html"}, "Stock view template");
 
 print   end_html;

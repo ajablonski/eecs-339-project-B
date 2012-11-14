@@ -15,7 +15,7 @@ redirectIfNotLoggedIn();
 my @cookies = refreshCookies();
 
 print   header(-cookies=>\@cookies),
-        start_html( -title=>'Home',
+        start_html( -title=>'Portfolio View',
                     -head=>[ Link({ -rel=>"stylesheet",
                                     -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css"}),
                              Link({ -rel=>"stylesheet",
@@ -26,7 +26,10 @@ print   header(-cookies=>\@cookies),
         "\n\n";
 
 
-print   div({-class=>'navbar'}, "You are logged in as " . getCurrentUser()), "\n";
+print   div({-class=>'navbar'}, 
+            "You are logged in as " . getCurrentUser(), p, "\n",
+            a({href=>"home.pl"}, "Return to list of portfolios")
+        ), "\n";
 
 my $portID = param('portID');
 my $error;
@@ -39,9 +42,19 @@ eval {
 $error = $@;
 print $error if $error;
 
+my @stockInfo;
+
+eval {
+    @stockInfo = ExecSQL($dbuser, $dbpasswd, "SELECT stock, numShares FROM $netID.holdings WHERE portfolioID = ?", undef, $portID);
+};
+
+$error = $@;
+print $error if $error;
+
+
 print   div({-class=>'portfolio-actions sidebar'}, "\n",
             h2("Estimated present market value of the portfolio: "),
-            h2("Total amount of cash / cash account: \$$portfolioInfo[1]"),
+            h2("Total amount of cash / cash account: \$", sprintf("%.2f", $portfolioInfo[1])),
             h3("Actions"), "\n",
 
             a({ -class=>"btn btn-primary btn-small action-btn accordion-toggle",
@@ -81,10 +94,6 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             ), "\n",
 
             div({-id=>"bought", -class=>"collapse"}, "\n",
-                "Which stocks
-                how many
-                for what price
-                submit",
                 start_form({-class=>"form-inline"}), "\n",
                     "Stocks bought",
                     '<input type="text" id="inputStockBought">', br,
@@ -128,10 +137,9 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
             ), "\n\n",
-        ); # End portfolio actions
+        ), "\n\n\n"; # End portfolio actions
 
-print   div({-class=>"container"},
-            a({href=>"home.pl"}, "Return to list of portfolios"),
+print   "<div class=\"container\">",
             h1("Portfolio view: $portfolioInfo[0]"), 
             h2("Portfolio statistics"),
             ul(
@@ -151,16 +159,31 @@ print   div({-class=>"container"},
                 li("The correlation of the stocks in the portfolio")
             ),
             hr,
-            h2("List of Stock Holdings"),
-            ul({-class=>"stock-holdings"},
-   
-            )
+            h2("List of Stock Holdings"), "\n",
+            "<table border=\"1\">\n",
+            Tr(
+                th(['Stock Symbol', 'Number of Shares']) 
+            ), "\n";
 
-        );
+foreach my $row (@stockInfo) {
+    print   Tr(
+                td([
+                    a({href=>"stock.pl?portID=$portID&stock=@$row[0]"},
+                        @$row[0]
+                    ),
+                    @$row[1]
+                ]), 
+            ), "\n";
+}
+print       "</table>\n";
 
-print   '<script src="http://twitter.github.com/bootstrap/assets/js/jquery.js" /> </script>',
-        '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"> </script>',
-        '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"> </script>',
+
+print   "</div>\n";
+        
+
+print   '<script src="http://twitter.github.com/bootstrap/assets/js/jquery.js" /> </script>', "\n",
+        '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"> </script>', "\n", 
+        '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"> </script>', "\n",
         '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-transition.js"> </script>';
 
 
