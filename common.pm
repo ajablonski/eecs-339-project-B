@@ -4,6 +4,7 @@ our @ISA = 'Exporter';
 our @EXPORT = qw(   $loginCookieName
                     redirectIfNotLoggedIn
                     getCurrentUser
+                    refreshCookies
                     );
 
 use strict;
@@ -41,10 +42,25 @@ sub redirectIfNotLoggedIn {
     }
 }
 
+
 sub getCurrentUser {
     my $loginCookieIn = cookie($loginCookieName);
     my $email = (split(/\//, $loginCookieIn))[0];
 
     return $email;
 }
+
+
+sub refreshCookies {
+    my @outCookies;
+    my $loginCookieInData = cookie($loginCookieName);
+    my $loginCookieOut = cookie(-name=>$loginCookieName,
+            -value=>$loginCookieInData,
+            -expires=>'+1h');
+
+    push @outCookies, $loginCookieOut;
+    
+    return @outCookies;
+}
+
 

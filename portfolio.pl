@@ -12,7 +12,9 @@ require "sql.pl";
 
 redirectIfNotLoggedIn();
 
-print   header,
+my @cookies = refreshCookies();
+
+print   header(-cookies=>\@cookies),
         start_html( -title=>'Home',
                     -head=>[ Link({ -rel=>"stylesheet",
                                     -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css"}),
@@ -24,11 +26,22 @@ print   header,
         "\n\n";
 
 
-print   div({-class=>'navbar'}, "You are logged in as " . getCurrentUser()), "\n",
+print   div({-class=>'navbar'}, "You are logged in as " . getCurrentUser()), "\n";
 
-        div({-class=>'portfolio-actions sidebar'}, "\n",
+my $portID = param('portID');
+my $error;
+my @portfolioInfo;
+
+eval {
+    @portfolioInfo = ExecSQL($dbuser, $dbpasswd, "SELECT name, cashAccount FROM $netID.portfolios where id = ?", "ROW", $portID);
+};
+
+$error = $@;
+print $error if $error;
+
+print   div({-class=>'portfolio-actions sidebar'}, "\n",
             h2("Estimated present market value of the portfolio: "),
-            h2("Total amount of cash / cash account: "),
+            h2("Total amount of cash / cash account: \$$portfolioInfo[1]"),
             h3("Actions"), "\n",
 
             a({ -class=>"btn btn-primary btn-small action-btn accordion-toggle",
@@ -118,7 +131,8 @@ print   div({-class=>'navbar'}, "You are logged in as " . getCurrentUser()), "\n
         ); # End portfolio actions
 
 print   div({-class=>"container"},
-            h1("Portfolio view: [[Portfolio name]]"),
+            a({href=>"home.pl"}, "Return to list of portfolios"),
+            h1("Portfolio view: $portfolioInfo[0]"), 
             h2("Portfolio statistics"),
             ul(
                 li(u("For all stocks:"),
