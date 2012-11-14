@@ -5,6 +5,7 @@ our @EXPORT = qw(   $loginCookieName
                     redirectIfNotLoggedIn
                     getCurrentUser
                     refreshCookies
+                    checkLogout
                     );
 
 use strict;
@@ -39,6 +40,20 @@ sub redirectIfNotLoggedIn {
         if ($error or $row[0] != 1) {
             print redirect('login.pl');
         }
+    }
+}
+
+
+sub checkLogout {
+    my $action = param("act");
+
+    if (defined($action) and ($action eq "logout")) {
+        my @outCookies;
+        my $loginCookieOut = cookie(-name=>$loginCookieName,
+                -value=>"",
+                -expires=>'-1h');
+        push @outCookies, $loginCookieOut;
+        print redirect(-uri=>'login.pl', -cookie=>\@outCookies);
     }
 }
 

@@ -13,6 +13,8 @@ require "sql.pl";
 
 redirectIfNotLoggedIn();
 
+checkLogout();
+
 my @cookies = refreshCookies();
 
 my $currentUser = getCurrentUser();
@@ -31,6 +33,7 @@ print   header(-cookies=>\@cookies),
 
 print   div({-class=>'navbar'}, 
             "You are logged in as " . getCurrentUser(), p, "\n",
+            a({href=>"home.pl?act=logout"}, "Log out")
         ), "\n";
 
 my @portTable;
