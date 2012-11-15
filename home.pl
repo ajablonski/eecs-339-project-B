@@ -18,6 +18,21 @@ checkLogout();
 my @cookies = refreshCookies();
 
 my $currentUser = getCurrentUser();
+my $action;
+my $error;
+if (defined(param('act'))) {
+    $action = param('act');
+}
+
+if ($action eq 'delete') {
+    my $portID = param('portID');
+    eval {
+        ExecSQL($dbuser, $dbpasswd, "DELETE FROM $netID.portfolios WHERE id = ?", undef, $portID);
+    };
+
+    $error = $@;
+}
+
 
 print   header(-cookies=>\@cookies),
         start_html( -title=>"Home",
@@ -29,7 +44,8 @@ print   header(-cookies=>\@cookies),
                     -style=>{'src'=>'portfolio.css'}
         ),
         "\n\n";
-        h1('Home');
+
+print $error if $error;
 
 print   div({-class=>'navbar'}, 
             "You are logged in as " . getCurrentUser(), p, "\n",
@@ -42,14 +58,13 @@ eval {
     @portTable = ExecSQL($dbuser, $dbpasswd, "SELECT id, name, cashAccount FROM $netID.portfolios WHERE owner = ?",
         undef, $currentUser);
 };
-
-my $error = $@;
+$error = $@;
 
 # Print portfolio table
 print   h1("Portfolios");
 print   "<table border=\"1\">"; 
 print   Tr(
-            th(['Portfolio name', 'Cash amount'])
+            th(['Portfolio name', 'Cash amount', 'Delete portfolio'])
         );
 foreach my $row (@portTable)
 {
@@ -59,7 +74,10 @@ foreach my $row (@portTable)
                     a({href=>"portfolio.pl?portID=$portID"},
                         @$row[1]
                     ),
-                    sprintf("\$%10.2f", @$row[2])
+                    sprintf("\$%10.2f", @$row[2]),
+                    a({href=>"home.pl?portID=$portID&act=delete"},
+                        "Delete"
+                    )
                 ])
             );
 }

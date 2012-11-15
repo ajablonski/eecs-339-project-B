@@ -31,7 +31,6 @@ if (defined($action) and defined($run) and $run) {
         eval {
             ExecSQL($dbuser, $dbpasswd, "UPDATE $netID.portfolios SET cashAccount = cashAccount - ? WHERE id = ?", undef, $amount, $portID);
         };
-        print $@;
         $error = $@;
     } elsif ($action eq 'sellStock' or $action eq 'buyStock') {
         my $shares = param('shares');
@@ -41,7 +40,6 @@ if (defined($action) and defined($run) and $run) {
         eval {
             BuySellStock($dbuser, $dbpasswd, $shares, $stock, $price, $portID);
         };
-        print $@;
         $error = $@;
     }
 }
@@ -58,6 +56,7 @@ print   header(-cookies=>\@cookies),
         "\n\n";
 
 
+print $error if $error;
 print   div({-class=>'navbar'}, 
             "You are logged in as " . getCurrentUser(), p, "\n",
             a({href=>"home.pl?act=logout"}, "Log out"), p, 
@@ -65,7 +64,6 @@ print   div({-class=>'navbar'},
         ), "\n";
 
 # From work done before page began
-print $error if $error;
 
 my @portfolioInfo;
 
