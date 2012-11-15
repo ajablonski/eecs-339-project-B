@@ -74,7 +74,9 @@ print   start_form({-class=>"form-inline"}),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
            hidden(-name=>"stock", -value=>$symbol, -override=>1),
            "Start date", '<input type="date" name="start">', br,
+           "Leave empty for earliest date for which data is available", br,
            "End date", '<input type="date" name="end">', br,
+           "Leave empty for today", br,
            submit,
         end_form;
 print   "</div>";

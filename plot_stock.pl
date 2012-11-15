@@ -78,7 +78,11 @@ if ($type eq "plot") {
         print GNUPLOT "set output\n";             # output the PNG to stdout
         print GNUPLOT "set xdata time\n";
         print GNUPLOT "set timefmt \"%s\"\n";
-        print GNUPLOT "set format x \"\%m/\%y\"\n";
+        if ($end - $start > 9000000) {
+            print GNUPLOT "set format x \"\%m/\%y\"\n";
+        } else {
+            print GNUPLOT "set format x \"\%m/\%d/\%y\"\n";
+        }
         print GNUPLOT "plot '-' using 1:2 with linespoints\n"; # feed it data to plot
         foreach my $r (@rows) {
             print GNUPLOT $r->[0], "\t", $r->[1], "\n";

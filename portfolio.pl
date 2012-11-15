@@ -145,7 +145,7 @@ foreach my $quote (@stockQuotes) {
 print   h2("List of Stock Holdings"), "\n",
         "<table border=\"1\">\n",
         Tr(
-            th(['Stock Symbol', 'Number of Shares', 'Most recent price/share', 'Estimated present value']) 
+            th(['Symbol', '# of Shares', 'Most recent price/share', 'Estimated value']) 
         ), "\n";
 
 my $estimatedPortValue = 0;
@@ -266,12 +266,12 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             div({-id=>"newDailyInfo", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
                     "Stock", '<input type="text" name="stock" id="newDataStock">', br,
-                    "Date", '<input type="date" name="date" id="newDataDate">', br,
-                    "Open", '<input type="number" name="open" id="newDataOpen">',
-                    "Close", '<input type="number" name="close" id="newDataClose">', br,
-                    "High", '<input type="number" name="high" id="newDataHigh">',
-                    "Low", '<input type="number" name="low" id="newDataLog">', br,
-                    "Volume", '<input type="number" name="volume" id="newDataVolume">', br,
+                    "Date", '<input type="date" name="date" id="newDataDate" min="0.01" step="0.01">', br,
+                    "Open", '<input type="number" name="open" id="newDataOpen" min="0.01" step="0.01">',
+                    "Close", '<input type="number" name="close" id="newDataClose" min="0.01" step="0.01">', br,
+                    "High", '<input type="number" name="high" id="newDataHigh" min="0.01" step="0.01">',
+                    "Low", '<input type="number" name="low" id="newDataLog" min="0.01" step="0.01">', br,
+                    "Volume", '<input type="number" name="volume" id="newDataVolume" min="1">', br,
                     hidden(-name=>'run', -value=>1, -override=>1),
                     hidden(-name=>'act', -value=>'addData', -override=>1),
                     hidden(-name=>'portID', -value=>$portID, -override=>1),
