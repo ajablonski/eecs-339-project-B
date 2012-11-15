@@ -12,11 +12,10 @@ CREATE TABLE portfolios (
     UNIQUE (owner, name),
     CONSTRAINT no_negative_cash_balance CHECK (cashAccount >= 0)
 );
-
 -- individual stock holdings for a specific portfolio
 CREATE TABLE holdings (
   portfolioID int REFERENCES portfolios(id) ON DELETE CASCADE,
-  stock char(16) NOT NULL REFERENCES cs339.stockssymbols(symbol),
+  stock char(16) NOT NULL, --REFERENCES cs339.stockssymbols(symbol),
   numShares int NOT NULL CHECK (numShares > 0),
   UNIQUE(portfolioID, stock)
 );
@@ -28,10 +27,15 @@ CREATE OR REPLACE TRIGGER initializePortfolio
     FOR EACH ROW
     BEGIN
         :new.id := portfolioID.NEXTVAL;
-        IF :old.cashAccount IS NULL THEN
-            :new.cashAccount := 0;
-        END IF;
     END;
 /
 
-
+CREATE TABLE newstocksdaily (
+    symbol CHAR(16) NOT NULL,
+    timestamp number NOT NULL,
+    open number NOT NULL,
+    high number NOT NULL,
+    low number NOT NULL,
+    close number NOT NULL,
+    volume number NOT NULL
+);

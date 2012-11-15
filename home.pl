@@ -34,7 +34,7 @@ if ($action eq 'delete') {
 } elsif ($action eq 'newPort') {
     my $name = param('name');
     eval {
-        ExecSQL($dbuser, $dbpasswd, "INSERT INTO $netID.portfolios (name, owner) VALUES (?, ?) ", undef, $name, $currentUser);
+        ExecSQL($dbuser, $dbpasswd, "INSERT INTO $netID.portfolios (name, owner, cashAccount) VALUES (?, ?, 0) ", undef, $name, $currentUser);
     };
 
     $error = $@;
