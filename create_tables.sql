@@ -23,11 +23,14 @@ CREATE TABLE holdings (
 
 CREATE SEQUENCE portfolioID;
 
-CREATE OR REPLACE TRIGGER generatePortfolioID
+CREATE OR REPLACE TRIGGER initializePortfolio
     BEFORE INSERT ON portfolios
     FOR EACH ROW
     BEGIN
         :new.id := portfolioID.NEXTVAL;
+        IF :old.cashAccount IS NULL THEN
+            :new.cashAccount := 0;
+        END IF;
     END;
 /
 

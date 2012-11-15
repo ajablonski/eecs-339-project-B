@@ -31,6 +31,13 @@ if ($action eq 'delete') {
     };
 
     $error = $@;
+} elsif ($action eq 'newPort') {
+    my $name = param('name');
+    eval {
+        ExecSQL($dbuser, $dbpasswd, "INSERT INTO $netID.portfolios (name, owner) VALUES (?, ?) ", undef, $name, $currentUser);
+    };
+
+    $error = $@;
 }
 
 
@@ -41,7 +48,7 @@ print   header(-cookies=>\@cookies),
                              Link({ -rel=>"stylesheet",
                                     -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap.css" })
                             ],
-                    -style=>{'src'=>'portfolio.css'}
+                    -style=>{'src'=>'home.css'}
         ),
         "\n\n";
 
@@ -82,8 +89,14 @@ foreach my $row (@portTable)
             );
 }
 
-print   "</table>"; 
+print   "</table>", br, br, "\n\n"; 
 
+print   h2("Add new portfolio");
+print   start_form,
+            textfield(-name=>"name"),
+            hidden(-name=>"act", -value=>"newPort", -override=>1),p,
+            submit("Add new portfolio"),
+        end_form;
 
 print   
         a({-href=>"stockView.html"}, "Stock view template");
