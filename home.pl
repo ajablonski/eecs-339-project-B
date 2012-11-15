@@ -77,7 +77,8 @@ foreach my $row (@portTable)
 {
     my $portID = @$row[0];
     print   Tr(
-                td([
+                td({-align=>'right'},
+                    [
                     a({href=>"portfolio.pl?portID=$portID"},
                         @$row[1]
                     ),
@@ -98,8 +99,7 @@ print   start_form,
             submit("Add new portfolio"),
         end_form;
 
-print   
-        a({-href=>"stockView.html"}, "Stock view template");
+print   a({-href=>"stockView.html"}, "Stock view template");
 
 print   end_html;
 
