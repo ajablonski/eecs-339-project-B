@@ -33,6 +33,16 @@ if (defined($action) and defined($run) and $run) {
         };
         print $@;
         $error = $@;
+    } elsif ($action eq 'sellStock' or $action eq 'buyStock') {
+        my $shares = param('shares');
+        my $stock = param('stock');
+        my $price = param('price');
+        if ($action eq 'sellStock') {$shares = -$shares};
+        eval {
+            BuySellStock($dbuser, $dbpasswd, $shares, $stock, $price, $portID);
+        };
+        print $@;
+        $error = $@;
     }
 }
 
@@ -125,12 +135,15 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
 
             div({-id=>"bought", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
-                    "Stocks bought",
-                    '<input type="text" id="inputStockBought">', br,
+                    "Stock bought",
+                    '<input type="text" name="stock" id="inputStockBought">', br,
                     "# of stocks",
-                    '<input type="number" id="inputNumBought">', br,
+                    '<input type="number" name="shares" id="inputNumBought" min="0">', br,
                     "Buying price",
-                    '<input type="number" id="inputPriceBought" min="0.01" step="0.01">', br,
+                    '<input type="number" name="price" id="inputPriceBought" min="0.01" step="0.01">', br,
+                    hidden(-name=>'run', -value=>1, -override=>1),
+                    hidden(-name=>'act', -value=>'buyStock', -override=>1),
+                    hidden(-name=>'portID', -value=>$portID, -override=>1),
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
             ), "\n\n",
@@ -144,12 +157,15 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
 
             div({-id=>"sold", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
-                    "Stocks sold",
-                    '<input type="text" id="inputStockBought">', br,
+                    "Stock sold",
+                    '<input type="text" name="stock" id="inputStockSold">', br,
                     "# of stocks",
-                    '<input type="number" id="inputNumBought">', br,
+                    '<input type="number" name="shares" id="inputNumSold" min="0">', br,
                     "Selling price",
-                    '<input type="number" id="inputPriceBought" min="0.01" step="0.01">', br,
+                    '<input type="number" name="price" id="inputPriceSold" min="0.01" step="0.01">', br,
+                    hidden(-name=>'run', -value=>1, -override=>1),
+                    hidden(-name=>'act', -value=>'sellStock', -override=>1),
+                    hidden(-name=>'portID', -value=>$portID, -override=>1),
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
             ), "\n\n",

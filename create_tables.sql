@@ -10,7 +10,7 @@ CREATE TABLE portfolios (
     cashAccount number(10, 2) NOT NULL, --w2.syronex.com/jmr/edu/db/introduction-to-oracle/ this is suggested currency for oracle sql
     name varchar(100),
     UNIQUE (owner, name),
-    CONSTRAINT no_nonzero_cash_balance CHECK (cashAccount >= 0)
+    CONSTRAINT no_negative_cash_balance CHECK (cashAccount >= 0)
 );
 
 -- individual stock holdings for a specific portfolio
