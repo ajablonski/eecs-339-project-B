@@ -7,7 +7,7 @@ use CGI qw(:standard);
 use user;
 use common;
 use DBI;
-
+use Date::Format;
 require "sql.pl";
 
 redirectIfNotLoggedIn();
@@ -16,6 +16,17 @@ my @cookies = refreshCookies();
 
 my $symbol = param("stock");
 my $portID = param("portID");
+my $start = param('start');
+my $end = param('end');
+
+if (!$start) {
+    $start = time2str("%Y-%m-%d", 0);
+} 
+
+if (!$end) {
+    $end = time2str("%Y-%m-%d", time);
+} 
+
 
 print   header(-cookies=>\@cookies),
         start_html( -title=>"Stock View",
@@ -50,8 +61,31 @@ eval {
 $error = $@;
 print $error if $error;
 
+print   "<div class=\"container\">";
+
 print   h1("$symbol");
 print   h2("Number of shares: $stockInfo[0]");
+
+print   img({src=>"plot_stock.pl?symbol=$symbol&type=plot&start=$start&end=$end"});
+
+
+print   start_form({-class=>"form-inline"}),
+           hidden(-name=>"type", -value=>"plot", -override=>1),
+           hidden(-name=>"portID", -value=>$portID, -override=>1),
+           hidden(-name=>"stock", -value=>$symbol, -override=>1),
+           "Start date", '<input type="date" name="start">', br,
+           "End date", '<input type="date" name="end">', br,
+           submit,
+        end_form;
+print   "</div>";
+
+
+print   "<div class=\"sidebar\">";
+print   iframe({src=>"plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end",
+            width=>"250 px", height=>"100%"    
+        });
+print   "</div>";
+
 
 print   '<script src="http://twitter.github.com/bootstrap/assets/js/jquery.js" /> </script>', "\n",
         '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"> </script>', "\n", 
