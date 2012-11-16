@@ -13,8 +13,8 @@ use File::Copy;
 BEGIN {
     $ENV{PORTF_DBMS}="oracle";
     $ENV{PORTF_DB}="cs339";
-    $ENV{PORTF_DBUSER}="sjd842";
-    $ENV{PORTF_DBPASS}="z5kathUG6";
+    $ENV{PORTF_DBUSER}="$dbuser";
+    $ENV{PORTF_DBPASS}="$dbpasswd";
 
     unless ($ENV{BEGIN_BLOCK}) {
         use Cwd;
