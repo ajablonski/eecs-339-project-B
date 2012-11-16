@@ -4,6 +4,25 @@ use Data::Dumper;
 
 require Exporter;
 
+BEGIN {
+    $ENV{PORTF_DBMS}="oracle";
+    $ENV{PORTF_DB}="cs339";
+    $ENV{PORTF_DBUSER}="sjd842";
+    $ENV{PORTF_DBPASS}="z5kathUG6";
+
+    unless ($ENV{BEGIN_BLOCK}) {
+        use Cwd;
+        $ENV{ORACLE_BASE}="/raid/oracle11g/app/oracle/product/11.2.0.1.0";
+        $ENV{ORACLE_HOME}=$ENV{ORACLE_BASE}."/db_1";
+        $ENV{ORACLE_SID}="CS339";
+        $ENV{LD_LIBRARY_PATH}=$ENV{ORACLE_HOME}."/lib";
+        $ENV{BEGIN_BLOCK} = 1;
+        $ENV{GDFONTPATH}="/usr/share/fonts/liberation";
+        $ENV{GNUPLOT_DEFAULT_GDFONT}="LiberationSans-Regular";
+        exec 'env',cwd().'/'.$0,@ARGV;
+    }
+};
+
 @ISA=qw(Exporter);
 @EXPORT=qw(ExecStockSQL GetStockPrefix);
 
