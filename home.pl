@@ -48,7 +48,7 @@ print   header(-cookies=>\@cookies),
                              Link({ -rel=>"stylesheet",
                                     -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap.css" })
                             ],
-                    -style=>{'src'=>'home.css'}
+                    -style=>{'src'=>'portfolio.css'}
         ),
         "\n\n";
 
@@ -94,7 +94,7 @@ print   "</table>", br, br, "\n\n";
 
 print   h2("Add new portfolio");
 print   start_form,
-            textfield(-name=>"name"),
+            textfield(-name=>"name", -class=>"addPortfolio"),
             hidden(-name=>"act", -value=>"newPort", -override=>1),p,
             submit("Add new portfolio"),
         end_form;
