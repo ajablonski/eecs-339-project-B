@@ -19,6 +19,8 @@ my $portID = param("portID");
 my $start = param('start');
 my $end = param('end');
 my $futureSteps = param('futureSteps');
+my $tradecost = param('tradecost');
+my $initialcash = param('initialcash');
 
 if (!$start) {
     $start = time2str("%Y-%m-%d", 0);
@@ -30,6 +32,14 @@ if (!$end) {
 
 if (!$futureSteps) {
     $futureSteps = 7;
+} 
+
+if (!$tradecost) {
+    $tradecost = 3;
+} 
+
+if (!$initialcash) {
+    $initialcash = 1000;
 } 
 
 print   header(-cookies=>\@cookies),
@@ -97,6 +107,28 @@ print   start_form({-class=>"form-inline"}),
            submit,
         end_form;
 print   "</div>";
+
+print   hr;
+print   h3("Automated Strategy");
+print   p("Shannon Ratchet");
+print   start_form({-class=>"form-inline"}),
+           hidden(-name=>"type", -value=>"plot", -override=>1),
+           hidden(-name=>"portID", -value=>$portID, -override=>1),
+           hidden(-name=>"stock", -value=>$symbol, -override=>1),
+           "Start date", '<input type="date" name="start">', br,
+           "Leave empty for earliest date for which data is available", br,
+           "End date", '<input type="date" name="end">', br,
+           "Leave empty for today", br,
+           "Initial Cash \$", '<input type="int" name="initialcash">', br,
+           "Leave empty for \$1000", br,
+           "Trade Cost \$", '<input type="int" name="tradecost">', br,
+           "Leave empty for \$3", br,
+           submit,
+        end_form;
+print   iframe({src=>"shannon_ratchet.pl?symbol=$symbol&initialcash=$initialcash&tradecost=$tradecost&start=$start&end=$end",
+        width=>"250 px", height=>"100%"
+        });
+
 
 
 print   "<div class=\"sidebar\">";
