@@ -1,0 +1,357 @@
+<html>
+<!-- ----- The PORTFOLIO VIEW ----- -->
+    
+<head>
+    
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">  
+
+<style>
+
+/* from bootstrap */
+body {
+  margin: 0;
+  
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333333;
+  background-color: #ffffff;
+}
+    
+.navbar {
+    width: 100%;
+    text-align: right;
+    min-height: 30px;
+    background-color: lightblue;
+    
+    display: block;
+    padding-right: 25px;
+    vertical-align: center;
+    /*margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+    margin-right: 15px;*/
+}
+    
+.portfolio-actions {
+    
+}
+
+.sidebar {
+    float: right;
+    display: block;
+    width: 350px;
+    height: 100%;
+    margin-right: 20px;
+}
+.action-btn { width : 240px; }
+    
+.container {
+    padding: 15px;
+    margin: 0px;
+    /*float: left;
+    display: block;*/
+
+}
+
+    h1 { font-size: 18px; color: black; }
+    h2 { font-size: 14px; color: darkblue; line-height: 14px; }
+    h3 { font-size: 13px; color: indigo; }
+ 
+    hr {width: 50%; color: #333; }
+    
+.stockName {
+    font-weight: bold;
+    color: turquoise;
+    padding-right: 50px;
+}
+    
+.stockSymbol {
+	padding-right: 50px;
+
+	display: inline-block;
+}
+
+.numShares { 
+	width: 200px;
+	display: inline-block;
+
+}
+
+.stockPast {
+    width: 200px;
+	display: inline-block;
+
+}
+
+.stockPredict {
+    width: 300px;
+	display: inline-block;
+}
+
+input[type=number] {
+    height: 30px;
+    width: 55px;
+}
+
+    input[type=text] {
+        height: 30px;
+        width: 55px;
+    }
+    
+    /*.portfolio-summary {
+        border: 4px double red;
+        width: 350px;
+        display: inline-block;
+        float: right;
+    }*/
+    
+
+/*
+#stock-holding-info {
+	height: 400px;
+    width: 400px;
+    border: 1px solid hotpink;
+    float: right;
+    margin: 50px;
+}*/
+    
+    
+    /*
+     p {
+     margin-top: 15px;
+     .	margin-bottom: 15px;
+     margin-left: 0px;
+     margin-right: 15px;
+     .
+     p {
+     display: block;
+     -webkit-margin-before: 1em;
+     -webkit-margin-after: 1em;
+     -webkit-margin-start: 0px;
+     -webkit-margin-end: 0px;
+     }
+*/
+
+</style>
+</head>
+
+<body>
+    
+    <div class="navbar">
+    You are anonymous, but you can also <a href="login.pl">login</a>
+    </div>
+    
+
+    
+        <div class="portfolio-actions sidebar">
+            
+            <!-- <div class="portfolio-summary"> -->
+            <h2> Estimated present market value of the portfolio: </h2>
+            
+            <h2> Total amount of cash / cash account: </h2>
+            <!-- </div> -->
+        
+            <h3> Actions </h3>
+        <!--<ul>
+            <li> Deposit cash to the cash account. </li>
+            <li> Withdraw cash from the cash account. </li>
+            <li> Record stocks bought </li>
+            <!-- (changing the cash and stock holdings in the portfolio) --
+            <li> Record stocks sold </li>
+            <!-- (changing the cash and stock holdings in the portfolio) --
+            <li> Record new daily stock information </li>
+            <!--(like the above), beyond that in the historic data we give you. --
+            <li> </li>
+            <li> </li>
+            <li> Run at least one automated trading strategy on a stock, using historical information, to see how well it performs. </li>
+        </ul> -->
+            
+        <!-- ----- DEPOSIT ----- -->
+        <a class="btn btn-primary btn-small action-btn accordion-toggle"
+            data-toggle="collapse" href="#deposit">
+            Deposit cash to the cash account. 
+            <i class="icon-chevron-down icon-white" style="float: right"></i>
+        </a>
+        <div id="deposit" class="collapse">
+            <form class="form-inline">
+                Amount to deposit
+                <input type="number" id="inputDeposit">
+                <button type="submit" class="btn btn-success">
+                    Submit
+                </button>
+            </form>
+        </div>
+            
+        <!-- ----- WITHDRAW ----- -->   
+        <a class="btn btn-small action-btn accordion-toggle"
+            data-toggle="collapse" href="#withdraw">
+            Withdraw cash from the cash account.
+            <i class="icon-chevron-down" style="float: right"></i>
+        </a>
+        <div id="withdraw" class="collapse">
+            <form class="form-inline">
+                Amount to withdraw
+                <input type="number" id="inputWithdraw">
+                    <button type="submit" class="btn btn-success">
+                        Submit
+                    </button>
+            </form>
+        </div>
+            
+        <!-- ----- BOUGHT ----- -->    
+        <a class="btn btn-small action-btn accordion-toggle"
+            data-toggle="collapse" href="#bought">
+            Record stocks bought.
+            <i class="icon-chevron-down" style="float: right"></i>
+        </a>
+        <div id="bought" class="collapse">
+            Which stocks
+            how many
+            for what price
+            Submit
+            <form class="form-inline">
+                Stocks bought:
+                <input type="text" id="inputStockBought"> <br/>
+                # of stocks
+                <input type="number" id="inputNumBought"> <br/>
+                Selling price
+                <input type="number" id="inputPriceBought"> <br/>
+                <button type="submit" class="btn btn-success">
+                    Submit
+                </button>
+            </form>
+        </div>
+
+        
+        <!-- ----- SOLD ----- -->   
+        <a class="btn btn-small action-btn accordion-toggle"
+            data-toggle="collapse" href="#sold">
+            Record stocks sold.
+            <i class="icon-chevron-down" style="float: right"></i>
+        </a>
+        <div id="sold" class="collapse">
+            <form class="form-inline">
+                Stocks sold:
+                <input type="text" id="inputStockSold"> <br/>
+                # of stocks
+                <input type="number" id="inputNumSold"> <br/>
+                Selling price
+                <input type="number" id="inputPriceSold"> <br/>
+                <button type="submit" class="btn btn-success">
+                    Submit
+                </button>
+            </form>
+        </div>
+        
+        <!-- ----- MORE INFO ----- -->   
+        <a class="btn btn-small action-btn accordion-toggle"
+            data-toggle="collapse" href="#newDailyInfo">
+            Record new daily stock information.
+            <i class="icon-chevron-down" style="float: right"></i>
+        </a>
+        <div id="newDailyInfo" class="collapse">
+            Which stock
+            for what price
+            Submit
+        </div>
+    </div> <!-- end portfolio-actions -->
+
+  
+    <!-- inputWithdraw, inputDeposit,
+     inputStockBought, inputNumBought, inputPriceBought,
+     inputStockSold, inputNumSold, inputPriceSold -->
+      <div class="container">      
+
+    
+    <h1> Portfolio view: [[Portfolio Name]] </h1>
+    
+    
+
+
+
+<h2> Portfolio Statistics </h2>
+<!-- <i> Note that these can take some time to compute, so they should be cached.</i> <br/> -->
+Based on historic data, we should be presented with information about:
+<ul>
+    <li> <u>For all stocks:</u>
+        <ul>
+            <li> The covariance/correlation matrix of the stocks in the portfolio.</li>
+        </ul>
+    </li>
+    <li> <u>For each stock:</u>
+        <ul>
+            <li> The coefficient of variation of each stock.</li>
+            <li> The Beta of each stock.</li>
+        </ul>
+
+    </li>
+    
+    <br/>
+    <li> the volatility of the stocks in the portfolio. </li>
+    <li> the correlation of the stocks in the portfolio. </li>
+</ul>
+
+<hr />
+        
+<h2> List of Stock Holdings </h2>
+        
+<ul class="stock-holdings">
+    <!-- for each stock in user's stock holdings for this portfolio -->
+    
+    <!--    <li class="individual-stock">
+            <span class="stockName"> [[ stock holding name ]] </span>
+            <span class="stockSymbol"> [[ stock symbol ]] </span>
+            <span class="numShares"> [[ number of shares ]] </span>
+             <br/>
+            <span class="stockPast">
+                See past performance of [[ name ]].
+            </span>
+            <span class="stockPredict">
+                See prediction of future performance of [[ name ]].
+            </span>
+        </li>  <!-- end individual stock -->
+
+	<li class="individual-stock">	<!-- start individual stock -->
+        <span class="stockName"> Individual Stock 1 </span>
+        <!-- br/ -->
+        <span class="stockSymbol"> stock symbol 1 </span>
+        <span class="numShares"> number of 1 shares </span>
+        <br/>
+        <span class="stockPast"> See past performance of 1. </span>
+        <br/>
+        <span class="stockPredict"> See prediction of future performance of 1. </span>
+	</li>  <!-- end individual stock -->
+    
+    
+    <li class="individual-stock">	<!-- start individual stock -->
+        <span class="stockName"> Individual Stock 2 </span>
+        <!-- br/ -->
+        <span class="stockSymbol"> stock symbol 2 </span>
+        <span class="numShares"> number of 2 shares </span>
+        <br/>
+        <span class="stockPast"> See past performance of 2. </span>
+        <br/>
+        <span class="stockPredict"> See prediction of future performance of 2. </span>
+	</li>  <!-- end individual stock -->
+    
+</ul>
+
+
+click on any holding to get a table and plot of its past performance. / <br/>
+Get the historic prices of the individual stock holdings. / <br/>
+See table + plot of holding's past performance. / <br/><br/>
+
+click on any holding to get a plot of its likely future performance, based on past performance. / <br/>
+Get the future price predictions for individual stock holdings. / <br/>
+See plot of holding's likely future performance.	<br/>
+
+</div> <!-- end container -->
+    
+    <script src="http://twitter.github.com/bootstrap/assets/js/jquery.js"> </script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"> </script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"> </script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-transition.js"> </script>
+</body>
+</html>
