@@ -102,7 +102,7 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             #h2("Total amount of cash / cash account: ", sprintf("\$%.2f", $portfolioInfo[1])),
             h3("Actions"), "\n",
 
-            a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
                 -'data-toggle'=>"collapse", -href=>"#deposit"}, 
                 "Deposit to cash account",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
@@ -120,7 +120,7 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             ), "\n\n",
 
             
-            a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
                 -'data-toggle'=>"collapse", -href=>"#withdraw"}, 
                 "Withdraw from cash account",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
@@ -138,7 +138,7 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             ), "\n\n",
 
             
-            a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
                 -'data-toggle'=>"collapse", -href=>"#bought"}, 
                 "Record stocks bought.",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
@@ -160,7 +160,7 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             ), "\n\n",
 
 
-            a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
+            a({ -class=>"btn btn-small action-btn accordion-toggle",
                 -'data-toggle'=>"collapse", -href=>"#sold"}, 
                 "Record stocks sold.",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
