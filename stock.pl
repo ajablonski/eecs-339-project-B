@@ -55,10 +55,10 @@ print   header(-cookies=>\@cookies),
 
 print   div({-class=>'navbar'}, 
             "You are logged in as " . getCurrentUser(), p, "\n",
-            a({href=>"home.pl?act=logout"}, "Log out"), p, 
+            a({href=>"home.pl?act=logout"}, "Log out"),
             a({-class=>"returnToPorts", -href=>"portfolio.pl?portID=$portID"}, 
                 "Return to portfolio view"
-            ), p,
+            ),
 	    a({ -class=>"returnToPorts", -href=>"home.pl"}, "Return to list of portfolios"),
         ), "\n";
 
@@ -77,6 +77,8 @@ $error = $@;
 print $error if $error;
 
 print   "<div class=\"container\">";
+
+print 	"<div class='main'>";
 
 print   h1("$symbol");
 print   h2("Number of shares: $stockInfo[0]");
@@ -108,8 +110,12 @@ print   start_form({-class=>"form-inline"}),
            submit,
         end_form;
 print   "</div>";
+print   "</div>";
 
-print   hr;
+print   "<div class=\"sidebar\">";
+
+
+
 print   h3("Automated Strategy");
 print   p("Shannon Ratchet");
 print   start_form({-class=>"form-inline"}),
@@ -126,17 +132,19 @@ print   start_form({-class=>"form-inline"}),
            "Leave empty for \$3", br,
            submit,
         end_form;
-print   iframe({src=>"shannon_ratchet.pl?symbol=$symbol&initialcash=$initialcash&tradecost=$tradecost&start=$start&end=$end",
-        width=>"250 px", height=>"100%"
-        });
 
+print  "<iframe id='ratchet' src='shannon_ratchet.pl?symbol=$symbol&initialcash=$initialcash&tradecost=$tradecost&start=$start&end=$end'";
+print 	"style='width=250px height=100px'></iframe>";
 
+#print   iframe({src=>"plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end",
+ #           width=>"250 px" #height=>"100%"    
+  #      });
+print	"<br/><br/><br/>";
 
-print   "<div class=\"sidebar\">";
-print   iframe({src=>"plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end",
-            width=>"250 px", height=>"100%"    
-        });
-print   "</div>";
+print 	"<iframe id='datalist' src='plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end'";
+print	"style='width=250px height=100px'> </iframe>";
+print 	"</div>";
+
 
 
 print   '<script src="http://twitter.github.com/bootstrap/assets/js/jquery.js" /> </script>', "\n",
