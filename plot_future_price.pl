@@ -29,40 +29,37 @@ BEGIN {
     }
 };
 
-use stock_data_access;
-
 my $type = param('type');
 my $symbol = param('symbol');
-my $start = param('start');
-my $end = param('end');
+my $steps = param('futureSteps');
 
-if (defined(param('start'))) {
-    $start = str2time(param('start'));
-} else {
-    $start = 0;
-}
-
-if (defined(param('end'))) {
-    $end = str2time(param('end'));
-} else {
-    $end = time;
+if (!defined($steps)) {
+      $steps = 7;
 }
 
 if (!defined($type)) {
     $type = 'plot';
 }
 
-my $sqlString = "";
-$sqlString .= "SELECT timestamp, close FROM ".GetStockPrefix()."StocksDaily ";
-$sqlString .= " WHERE symbol=rpad(:1,16) AND timestamp BETWEEN :2 AND :3";
-$sqlString .= " UNION ";
-$sqlString .= "SELECT timestamp, close FROM $netID.newstocksdaily ";
-$sqlString .= " WHERE symbol=rpad(:1,16) AND timestamp BETWEEN :2 AND :3";
+if (!defined($symbol)) {
+    $symbol = 'AAPL';
+}
+
+system "./get_data.pl --notime --close $symbol > _data.in";
+system "./time_series_project _data.in $steps AR 16 > _future_data.in 2>/dev/null";
+
+open DATA, "_future_data.in" or die $!;
 my @rows;
-eval {
-    @rows = ExecStockSQL("2D",$sqlString,$symbol, $start, $end);
-};
-my $error = $@;
+my $i = 0;
+while(<DATA>) {
+  chomp;
+  my @data = split;
+  if(int($data[2]) != 0) {
+    $rows[$i][0] = $data[0];
+    $rows[$i][1] = $data[2];
+    $i += 1;
+  }
+}
 
 if ($type eq "plot") {
     print header(-type => 'image/png', -expires => '-1h' );
@@ -76,13 +73,13 @@ if ($type eq "plot") {
 
         print GNUPLOT "set term png\n";           # we want it to produce a PNG
         print GNUPLOT "set output\n";             # output the PNG to stdout
-        print GNUPLOT "set xdata time\n";
-        print GNUPLOT "set timefmt \"%s\"\n";
-        if ($end - $start > 9000000) {
-            print GNUPLOT "set format x \"\%m/\%y\"\n";
-        } else {
-            print GNUPLOT "set format x \"\%m/\%d/\%y\"\n";
-        }
+        #print GNUPLOT "set xdata time\n";
+        #print GNUPLOT "set timefmt \"%s\"\n";
+        #if ($end - $start > 9000000) {
+        #    print GNUPLOT "set format x \"\%m/\%y\"\n";
+        #} else {
+        #    print GNUPLOT "set format x \"\%m/\%d/\%y\"\n";
+        #}
         print GNUPLOT "plot '-' using 1:2 with linespoints\n"; # feed it data to plot
         foreach my $r (@rows) {
             print GNUPLOT $r->[0], "\t", $r->[1], "\n";
@@ -106,7 +103,7 @@ if ($type eq "plot") {
     foreach my $r (@rows) {
         print   Tr(
                     td([
-                        time2str("%D", $r->[0]),
+                        $r->[0],
                         $r->[1]
                     ]),
                 ), "\n";
@@ -114,6 +111,21 @@ if ($type eq "plot") {
     print "</table>";
     print end_html;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
