@@ -132,7 +132,7 @@ foreach my $row (@stockInfo) {
 
 my $stockArgList = join(" ", @stockList);
 
-my @stockQuotes = split("//", `./quote.pl $stockArgList`);
+my @stockQuotes = split("//", `./get_close.pl $stockArgList`);
 my %stockQuoteDict = ();
 
 foreach my $quote (@stockQuotes) {

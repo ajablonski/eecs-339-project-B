@@ -37,5 +37,6 @@ CREATE TABLE newstocksdaily (
     high number NOT NULL,
     low number NOT NULL,
     close number NOT NULL,
-    volume number NOT NULL
+    volume number NOT NULL,
+    UNIQUE(timestamp, symbol)
 );
