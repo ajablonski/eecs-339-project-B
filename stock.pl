@@ -46,9 +46,10 @@ print   header(-cookies=>\@cookies),
 print   div({-class=>'navbar'}, 
             "You are logged in as " . getCurrentUser(), p, "\n",
             a({href=>"home.pl?act=logout"}, "Log out"), p, 
-            a({href=>"portfolio.pl?portID=$portID"}, 
+            a({-class=>"returnToPorts", -href=>"portfolio.pl?portID=$portID"}, 
                 "Return to portfolio view"
-            )
+            ), p,
+	    a({ -class=>"returnToPorts", -href=>"home.pl"}, "Return to list of portfolios"),
         ), "\n";
 
 my $error;
