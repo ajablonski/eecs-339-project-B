@@ -87,7 +87,6 @@ print   hr;
 print   h3("Historic data");
 print   img({src=>"plot_stock.pl?symbol=$symbol&type=plot&start=$start&end=$end"});
 print   start_form({-class=>"form-inline"}),
-           hidden(-name=>"type", -value=>"plot", -override=>1),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
            hidden(-name=>"stock", -value=>$symbol, -override=>1),
            "Start date", '<input type="date" name="start">', br,
@@ -102,10 +101,9 @@ print   hr;
 print   h3("Estimated Future Price");
 print   img({src=>"plot_future_price.pl?symbol=$symbol&type=plot&futureSteps=$futureSteps"});
 print   start_form({-class=>"form-inline"}),
-           hidden(-name=>"type", -value=>"plot", -override=>1),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
            hidden(-name=>"stock", -value=>$symbol, -override=>1),
-           "Number of Future Steps", '<input type="date" name="futureSteps">', br,
+           "Number of Future Steps", '<input type="number" name="futureSteps" min=1 step=1>', br,
            "Leave empty for 7 days", br,
            submit,
         end_form;

@@ -4,6 +4,7 @@ use Getopt::Long;
 use Time::ParseDate;
 use Time::CTime;
 use FileHandle;
+use user;
 
 use stock_data_access;
 
@@ -45,14 +46,23 @@ push @fields, "low" if $low;
 push @fields, "close" if $close;
 push @fields, "volume" if $vol;
 
+my @innerFields = @fields;
+push @innerFields, "timestamp" if $notime;
+
 
 my $sql;
 
-$sql = "select " . join(",",@fields) . " from ".GetStockPrefix()."StocksDaily";
+$sql = "SELECT " . join(",",@fields) . " FROM ";
+$sql.= "(select " . join(",", @innerFields) . " from ".GetStockPrefix()."StocksDaily";
 $sql.= " where symbol = '$symbol'";
 $sql.= " and timestamp >= $from" if $from;
 $sql.= " and timestamp <= $to" if $to;
-$sql.= " order by timestamp";
+$sql.= " UNION ";
+$sql.= "SELECT " . join(",", @innerFields) . " FROM $netID.newstocksdaily ";
+$sql.= " where symbol = '$symbol'";
+$sql.= " and timestamp >= $from" if $from;
+$sql.= " and timestamp <= $to" if $to;
+$sql.= ") order by timestamp";
 
 my $data = ExecStockSQL("TEXT",$sql);
 
