@@ -37,7 +37,7 @@ int main()
     close(STDERR_FILENO);
     while (1) {
         system("./quote.pl");
-        sleep(60);
+        sleep(900); // Update every 15 minutes
     }
 
     exit(EXIT_SUCCESS);

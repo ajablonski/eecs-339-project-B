@@ -8,7 +8,6 @@ use Date::Parse;
 use Date::Format;
 require "sql.pl";
 
-close STDOUT;
 open(ERRORLOG, ">>", "quote.errlog") or die "CANNOT OPEN FILE";
 
 my $sqlString = "";
@@ -28,6 +27,11 @@ my $insertSQLstring = "";
 $insertSQLstring .= "INSERT INTO $netID.newstocksdaily (symbol, timestamp, high, low, close, open, volume)";
 $insertSQLstring .= " VALUES(?, ?, ?, ?, ?, ?, ?)";
 
+my $updateSQLstring = "";
+$updateSQLstring .= "UPDATE $netID.newstocksdaily ";
+$updateSQLstring .= " SET high=?, low=?, open=?, close=?, volume=? ";
+$updateSQLstring .= " WHERE symbol=? AND timestamp=?";
+
 if ($#ARGV>=0) {
     @symbols=@ARGV;
 } else {
@@ -45,15 +49,30 @@ foreach $symbol (@symbols) {
     $symbol =~ s/\s+$//;
     if (!defined($quotes{$symbol,"success"})) { 
     } else {
+#        eval {
+#            ExecSQL($dbuser, $dbpasswd, $insertSQLstring, undef, 
+#                $symbol,
+#                str2time($quotes{$symbol, "date"}),
+#                $quotes{$symbol, "high"},
+#                $quotes{$symbol, "low"},
+#                $quotes{$symbol, "open"},
+#                $quotes{$symbol, "close"},
+#                $quotes{$symbol, "volume"}
+#            );
+#        };
+#        $error = $@;
+#
+#        print ERRORLOG time2str('%c', time), $error, "\n" if $error;
+
         eval {
-            ExecSQL($dbuser, $dbpasswd, $insertSQLstring, undef, 
-                $symbol,
-                str2time($quotes{$symbol, "date"}),
+            ExecSQL($dbuser, $dbpasswd, $updateSQLstring, undef, 
                 $quotes{$symbol, "high"},
                 $quotes{$symbol, "low"},
                 $quotes{$symbol, "open"},
                 $quotes{$symbol, "close"},
-                $quotes{$symbol, "volume"}
+                $quotes{$symbol, "volume"},
+                $symbol,
+                str2time($quotes{$symbol, "date"})
             );
         };
         $error = $@;
