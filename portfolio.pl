@@ -225,15 +225,18 @@ print $error if $error;
 print   "<div class='container'>";
 
 # Start of sidebar div
-print   div({-class=>'portfolio-actions sidebar'}, "\n",
-            h3("Actions"), "\n",
+print "<div class='sidebar'>";
 
+print	h3("Actions"), "\n",   
+	div({-class=>'accordion', -id=>'portfolio-actions'}, "\n",
+
+	    div({ -class=>"accordion-group"},"\n",
             a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
-                -'data-toggle'=>"collapse", -href=>"#deposit"}, 
+                -'data-parent'=>"#portfolio-actions", -'data-toggle'=>"collapse", -href=>"#deposit"}, 
                 "Deposit to cash account",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
             ), "\n",
-            
+         
             div({-id=>"deposit", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
                     "Amount to deposit",
@@ -241,13 +244,14 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
                     hidden(-name=>'run', -value=>1, -override=>1),
                     hidden(-name=>'act', -value=>'deposit', -override=>1),
                     hidden(-name=>'portID', -value=>$portID, -override=>1),
-                    submit({-class=>"btn btn-success"}, "Submit"),
+                    br, submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
-            ), "\n\n",
+            )), "\n\n",
 
-            
+
+            div({ -class=>"accordion-group"},"\n",
             a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
-                -'data-toggle'=>"collapse", -href=>"#withdraw"}, 
+                -'data-parent'=>"#portfolio-actions", -'data-toggle'=>"collapse", -href=>"#withdraw"}, 
                 "Withdraw from cash account",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
             ), "\n",
@@ -259,13 +263,14 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
                     hidden(-name=>'run', -value=>1, -override=>1),
                     hidden(-name=>'act', -value=>'withdraw', -override=>1),
                     hidden(-name=>'portID', -value=>$portID, -override=>1),
-                    submit({-class=>"btn btn-success"}, "Submit"),
+                    br, submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
-            ), "\n\n",
+            )), "\n\n",
 
-            
+
+            div({ -class=>"accordion-group"},"\n",
             a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
-                -'data-toggle'=>"collapse", -href=>"#bought"}, 
+                -'data-parent'=>"#portfolio-actions", -'data-toggle'=>"collapse", -href=>"#bought"}, 
                 "Record stocks bought.",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
             ), "\n",
@@ -273,7 +278,7 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             div({-id=>"bought", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
                     "Stock bought",
-                    '<input type="text" name="stock" id="inputStockBought">', br,
+                    '<input type="text" name="stock" id="inputStockBought" class="stockSymbol">', br,
                     "# of shares",
                     '<input type="number" name="shares" id="inputNumBought" min="0">', br,
                     "Buying price",
@@ -283,11 +288,12 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
                     hidden(-name=>'portID', -value=>$portID, -override=>1),
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
-            ), "\n\n",
+            )), "\n\n",
 
 
+	    div({ -class=>"accordion-group"},"\n",
             a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
-                -'data-toggle'=>"collapse", -href=>"#sold"}, 
+                -'data-parent'=>"#portfolio-actions", -'data-toggle'=>"collapse", -href=>"#sold"}, 
                 "Record stocks sold.",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
             ), "\n",
@@ -295,7 +301,7 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
             div({-id=>"sold", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
                     "Stock sold",
-                    '<input type="text" name="stock" id="inputStockSold">', br,
+                    '<input type="text" name="stock" id="inputStockSold" class="stockSymbol">', br,
                     "# of shares",
                     '<input type="number" name="shares" id="inputNumSold" min="0">', br,
                     "Selling price",
@@ -305,18 +311,19 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
                     hidden(-name=>'portID', -value=>$portID, -override=>1),
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
-            ), "\n\n",
+            )), "\n\n",
 
 
+	    div({ -class=>"accordion-group"},"\n",
             a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
-                -'data-toggle'=>"collapse", -href=>"#newDailyInfo"}, 
+                -'data-parent'=>"#portfolio-actions", -'data-toggle'=>"collapse", -href=>"#newDailyInfo"}, 
                 "Record new stock data.",
                 '<i class="icon-chevron-down icon-white" style="float: right"></i>',
             ), "\n",
 
             div({-id=>"newDailyInfo", -class=>"collapse"}, "\n",
                 start_form({-class=>"form-inline"}), "\n",
-                    "Stock", '<input type="text" name="stock" id="newDataStock">', br,
+                    "Stock", '<input type="text" name="stock" id="newDataStock" class="stockSymbol">', br,
                     "Date", '<input type="date" name="date" id="newDataDate" min="0.01" step="0.01">', br,
                     "Open", '<input type="number" name="open" id="newDataOpen" min="0.01" step="0.01">',
                     "Close", '<input type="number" name="close" id="newDataClose" min="0.01" step="0.01">', br,
@@ -328,11 +335,12 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
                     hidden(-name=>'portID', -value=>$portID, -override=>1),
                     submit({-class=>"btn btn-success"}, "Submit"),
                 end_form
-            ), "\n\n",
-        ), "\n\n\n"; # End portfolio actions
+            )), "\n\n",
+        ), "\n\n\n"; # End portfolio actions div
+		   
+print "</div> <!-- end sidebar div -->";
 
-
-print   "<div class='main'>", # changed from "container"
+print   "<div class='main'>", 
             h1("Portfolio view: $portfolioInfo[0]"), 
             h2("Total amount of cash / cash account: &nbsp;&nbsp; <font color='green'> \$", sprintf("%.2f", $portfolioInfo[1]),"</font>"),
             h2("Estimated portfolio present market value: <font color='green'> \$", sprintf("\%.2f", $estimatedPortValue + $portfolioInfo[1]),"</font>"),
@@ -418,14 +426,15 @@ print "</table>";
 print "<br/><br/>"; 
 print   start_form({-class=>"form-inline"}),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
-           "Start date", '<input type="date" name="start" class="portDate">', 
-           "&nbsp; &nbsp; &nbsp; End date", '<input type="date" name="end" class="portDate">', 
-           '&nbsp; &nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="0" checked>Covariance Matrix',
-           '&nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="1">Coefficient Matrix',
+           '<input type="radio" name="docorrcoeff" value="0" checked>Covariance Matrix',
+           '&nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="1">Coefficient Matrix <br/><br/> ',
+           "Start date: ", '<input type="date" name="start" class="portDate">', 
+           "&nbsp; &nbsp; &nbsp; End date: ", '<input type="date" name="end" class="portDate">', 
+
            "&nbsp; &nbsp; &nbsp;", submit, br,
 
-           "Leave start date empty for earliest date for which data is available", br,
-           "Leave end date empty for today", br
+           "<i>Leave start date empty for earliest date for which data is available", br,
+           "Leave end date empty for today</i>", br
         end_form;
 # ----- END List of stock holdings w/statistics -----
 
