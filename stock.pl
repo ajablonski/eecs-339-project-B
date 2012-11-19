@@ -76,7 +76,7 @@ eval {
 $error = $@;
 print $error if $error;
 
-print   "<div class=\"container\">";
+# print   "<div class=\"container\">";
 
 print 	"<div class='main'>";
 
@@ -108,7 +108,7 @@ print   start_form({-class=>"form-inline"}),
            submit,
         end_form;
 print   "</div>";
-print   "</div>";
+# print   "</div>";
 
 print   "<div class=\"sidebar\">";
 

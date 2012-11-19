@@ -44,35 +44,29 @@ $con->timeout(60);
 
 %quotes = $con->fetch("usa",@symbols);
 
+my $recordOK;
+
+my ($sec, $min, $hr, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime(time);
+
+if (($wday <= 5 and $wday > 0) # If it's a weekday
+    and ($hr > 21 or ($isdst and $hr > 20))) { # and the market has closed
+    $recordOK = 1;
+} else {
+    $recordOK = 0;
+}
 
 foreach $symbol (@symbols) {
     $symbol =~ s/\s+$//;
-    if (!defined($quotes{$symbol,"success"})) { 
-    } else {
-#        eval {
-#            ExecSQL($dbuser, $dbpasswd, $insertSQLstring, undef, 
-#                $symbol,
-#                str2time($quotes{$symbol, "date"}),
-#                $quotes{$symbol, "high"},
-#                $quotes{$symbol, "low"},
-#                $quotes{$symbol, "open"},
-#                $quotes{$symbol, "close"},
-#                $quotes{$symbol, "volume"}
-#            );
-#        };
-#        $error = $@;
-#
-#        print ERRORLOG time2str('%c', time), $error, "\n" if $error;
-
+    if (defined($quotes{$symbol,"success"}) and $recordOK) { 
         eval {
-            ExecSQL($dbuser, $dbpasswd, $updateSQLstring, undef, 
+            ExecSQL($dbuser, $dbpasswd, $insertSQLstring, undef, 
+                $symbol,
+                str2time($quotes{$symbol, "date"}),
                 $quotes{$symbol, "high"},
                 $quotes{$symbol, "low"},
                 $quotes{$symbol, "open"},
                 $quotes{$symbol, "close"},
-                $quotes{$symbol, "volume"},
-                $symbol,
-                str2time($quotes{$symbol, "date"})
+                $quotes{$symbol, "volume"}
             );
         };
         $error = $@;
