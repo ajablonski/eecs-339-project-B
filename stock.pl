@@ -76,7 +76,7 @@ eval {
 $error = $@;
 print $error if $error;
 
-print   "<div class='container'>";
+# print   "<div class='container'>";
 
 
 print   "<div class='sidebar'>";
@@ -159,7 +159,7 @@ print   "</div>";
 
 
 
-print 	"</div> <!-- end container -->";
+# print 	"</div> <!-- end container -->";
 
 
 
