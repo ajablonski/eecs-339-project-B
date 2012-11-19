@@ -25,27 +25,6 @@ body {
      margin-right: 15px;*/
 }
 
-.portfolio-actions {
-    
-}
-
-.returnToPorts { float: left; padding-left: 10px; }
-
-.sidebar {
-    float: right;
-display: inline;
-    /*display: inline-block;
-    /*width: 30%; /*350px;*/
-   /* height: 100%;*/
-    /*margin-right: 20px;*/
-}
-
-.main {float: left; display: inline; padding: 15px; margin-top: 0; /*width: 65%;*/ }
-.action-btn {
-    width : 240px;
-    font-weight: bold;
-}
-
 .container {
     /*float: left;*/
     padding: 15px;
@@ -55,11 +34,48 @@ display: inline;
     
 }
 
+.sidebar {
+    float: right;
+    display: inline;
+    /*display: inline-block;
+    /*width: 30%; /*350px;*/
+   /* height: 100%;*/
+    /*margin-right: 20px;*/
+}
+
+.main {
+    float: left;
+    display: inline;
+    padding: 15px;
+    margin-top: 0;
+    /*width: 65%;*/
+}
+
 h1 { font-size: 18px; color: black; }
 h2 { font-size: 15px; color: darkblue; line-height: 14px; }
 h3 { font-size: 13.5px; color: indigo; }
 
 hr {width: 50%; color: #333; }
+
+td { padding: 4px }
+th { padding: 4px }
+
+.portfolio-actions {  }
+
+.action-btn {
+    width : 240px;
+    font-weight: bold;
+   /* margin-bottom: 5px;*/
+}
+
+
+
+.returnToPorts { 
+    float: left;
+    padding-left: 10px;
+}
+
+
 
 .stockName {
     font-weight: bold;
@@ -68,15 +84,13 @@ hr {width: 50%; color: #333; }
 }
 
 .stockSymbol {
-	padding-right: 50px;
-    
-	display: inline-block;
+    padding-right: 50px;
+    display: inline-block;
 }
 
 .numShares {
-	width: 200px;
-	display: inline-block;
-    
+    width: 200px;
+    display: inline-block;
 }
 
 .stockPast {
@@ -93,18 +107,25 @@ hr {width: 50%; color: #333; }
 /* this is all rather redundant */
 .portDate {width: 100px;} 
 
+input[type=date]#portEnd {width: 100px;}
+
 input[type=date] {width: 100px; /*margin-left: 5px;*/}
 
-input[type=date]#portEnd {width: 100px;}
+
+input[type=int].priceField { width: 70px; }
 
 input[type=number] {
     height: 30px;
     width: 55px;
+    margin-top: 4px;
 }
 
-input[type=text] {
+
+
+input[type=text].stockSymbol {
     height: 30px;
     width: 55px;
+    margin-top: 4px;
 }
 
 input[type=text].addPortfolio {
@@ -112,10 +133,16 @@ input[type=text].addPortfolio {
     width: 250px;
 }
 
-input[type=int].priceField { width: 70px; }
+/* for login/register page */
+input[type=text].emailInput {
+    width: 200px;
+    height: 20px;
+}
 
-td { padding: 4px }
-th { padding: 4px }
+
+
+
+
 /*.portfolio-summary {
  border: 4px double red;
  width: 350px;

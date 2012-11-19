@@ -130,7 +130,17 @@ if ($run and ($action eq "login")) {
 #}
 
 print   header,
-        start_html('Login to portfolio manager');
+        start_html( -title=>"Login to portfolio manager",
+                    -head=>[ Link({ -rel=>"stylesheet",
+                                    -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css"}),
+                             Link({ -rel=>"stylesheet",
+                                    -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap.css" })
+                            ],
+                    -style=>{'src'=>'portfolio.css'}
+		  ),
+        "\n\n";
+#print   header,
+#        start_html('Login to portfolio manager');
 
 
 if ($run and ($action eq "register")) {
@@ -201,11 +211,11 @@ if (!$run and ($action eq 'login')) {
     }
 
     print   start_form(-name=>'Login'),
-            "Email: ", p, textfield(-name=>'email'), p,
+            "Email: ", p, textfield(-name=>'email', -class=>'emailInput'), p,
             "Password: ", p, password_field(-name=>'password'), p,
             hidden(-name=>'run', -default=>['1']),
             hidden(-name=>'act', -value=>'login', -override=>1),
-            submit,
+            submit(-class=>'btn btn-primary', -value=>'Login'),
             end_form,
             "</div> <!-- end login div -->";
 
@@ -219,11 +229,11 @@ if (!$run and ($action eq 'login')) {
     }
 
     print   start_form(-name=>'Register'),
-            "Email: ", p, textfield(-name=>'regEmail'), p,
+            "Email: ", p, textfield(-name=>'regEmail', -class=>'emailInput'), p,
             "Password: ", p, password_field(-name=>'regPassword'), p,
             hidden(-name=>'run', -default=>['1']),
             hidden(-name=>'act', -value=>'register', -override=>1),
-            submit,
+            submit(-class=>'btn btn-danger', -value=>'Register'),
             end_form,
             "</div> <!-- end register div -->";
 }
