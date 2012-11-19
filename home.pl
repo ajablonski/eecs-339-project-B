@@ -67,9 +67,33 @@ eval {
 };
 $error = $@;
 
+print   "<div class='container'>";
+
+print   "<div class='sidebar'>";
+
+print   h2("Project Documents");
+print   "<ul>",
+        "<li> 1a) <a href='project-docs/Site_storyboard.pdf' target='_blank'>",
+                    "Storyboard  </a> </li>",
+        "<li> 1b) <a href='project-docs/Site_flowchart.pdf' target='_blank'>",
+                    "Flowchart  </a> </li>",
+        "<li> &nbsp; 2) <a href='project-docs/ER_Diagram.pdf' target='_blank'>",
+                    "ER diagram  </a> </li>",
+        "<li> &nbsp; 3) <a href='project-docs/Relations.pdf' target='_blank'>",
+                    "Relational design  </a> </li>",
+        "<li> &nbsp; 4) <a href='project-docs/SQL_DDL.pdf' target='_blank'>",
+                    "SQL DDL  </a> </li>",
+        "<li> &nbsp; 5) <a href='project-docs/SQL_DML-DQL.pdf' target='_blank'>",
+                    "SQL DML & DQL  </a> </li>",
+        "</ul>";
+
+print   "</div> <!-- end sidebar -->";
+
+
 # Print portfolio table
+print   "<div class='main'>";
 print   h1("Portfolios");
-print   "<table border=\"1\">"; 
+print   "<table border='1'>"; 
 print   Tr(
             th(['Portfolio name', 'Cash amount', 'Delete portfolio'])
         );
@@ -94,12 +118,15 @@ print   "</table>", br, br, "\n\n";
 
 print   h2("Add new portfolio");
 print   start_form,
-            textfield(-name=>"name", -class=>"addPortfolio"),
+            textfield(-name=>"name", -class=>"addPortfolio", -placeholder=>"Name your portfolio"),
             hidden(-name=>"act", -value=>"newPort", -override=>1),p,
-            submit("Add new portfolio"),
+            submit(-class=>"btn btn-primary", -value=>"Add new portfolio"),
         end_form;
 
-print   a({-href=>"stockView.html"}, "Stock view template");
+#print   a({-href=>"stockView.html"}, "Stock view template");
+
+print "</div> <!-- end main -->";
+print "</div> <!-- end container -->";
 
 print   end_html;
 
