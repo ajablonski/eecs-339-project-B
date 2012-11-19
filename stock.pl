@@ -76,7 +76,48 @@ eval {
 $error = $@;
 print $error if $error;
 
-# print   "<div class=\"container\">";
+print   "<div class='container'>";
+
+
+print   "<div class='sidebar'>";
+
+print   h2("Automated Strategy: &nbsp;Shannon Ratchet");
+
+print   start_form({-class=>"form-inline"}),
+           hidden(-name=>"type", -value=>"plot", -override=>1),
+           hidden(-name=>"portID", -value=>$portID, -override=>1),
+           hidden(-name=>"stock", -value=>$symbol, -override=>1),
+	   "Start date: ", '<input type="date" name="start" class="portDate">', 
+           "&nbsp; &nbsp; &nbsp; End date: ", '<input type="date" name="end" class="portDate">',
+	   "&nbsp; &nbsp; &nbsp;", br,
+           "<i>Leave start date empty for earliest date for which data is available", br,
+           "Leave end date empty for today</i>", br
+
+         #  "Start date", '<input type="date" name="start">', br,
+         #  "Leave empty for earliest date for which data is available", br,
+         #  "End date", '<input type="date" name="end">', br,
+         #  "Leave empty for today", br,
+           "Initial Cash \$", '<input type="int" name="initialcash" class="priceField"> ', #br,
+           "<i>Leave empty for \$1000</i>", br,
+           "Trade Cost \$", '<input type="int" name="tradecost" class="priceField">', #br,
+           "<i>Leave empty for \$3</i>", br,
+           submit,
+        end_form;
+
+print	h3("Shannon Ratchet Prediction");
+print  "<iframe id='ratchet' src='shannon_ratchet.pl?symbol=$symbol&initialcash=$initialcash&tradecost=$tradecost&start=$start&end=$end'";
+print 	"style='width=250px height=250px'></iframe>";
+
+#print   iframe({src=>"plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end",
+ #           width=>"250 px" #height=>"100%"    
+  #      });
+print	"<br/><br/><br/>";
+
+print	h3("Historic data table");
+print 	"<iframe id='datalist' src='plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end'";
+print	"style='width=250px height=100px'> </iframe>";
+print 	"</div>";
+
 
 print 	"<div class='main'>";
 
@@ -84,16 +125,23 @@ print   h1("$symbol");
 print   h2("Number of shares: $stockInfo[0]");
 
 print   hr;
-print   h3("Historic data");
+print   h3("Historic data plot");
 print   img({src=>"plot_stock.pl?symbol=$symbol&type=plot&start=$start&end=$end"});
 print   start_form({-class=>"form-inline"}),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
            hidden(-name=>"stock", -value=>$symbol, -override=>1),
-           "Start date", '<input type="date" name="start">', br,
-           "Leave empty for earliest date for which data is available", br,
-           "End date", '<input type="date" name="end">', br,
-           "Leave empty for today", br,
-           submit,
+          # "Start date", '<input type="date" name="start">', br,
+          # "Leave empty for earliest date for which data is available", br,
+          # "End date", '<input type="date" name="end">', br,
+          # "Leave empty for today", br,
+           "Start date: ", '<input type="date" name="start" class="portDate">', 
+           "&nbsp; &nbsp; &nbsp; End date: ", '<input type="date" name="end" class="portDate">', 
+
+           "&nbsp; &nbsp; &nbsp;", submit, br,
+
+           "<i>Leave start date empty for earliest date for which data is available", br,
+           "Leave end date empty for today</i>", br
+           #submit,
         end_form;
 
 print   hr;
@@ -103,45 +151,15 @@ print   img({src=>"plot_future_price.pl?symbol=$symbol&type=plot&futureSteps=$fu
 print   start_form({-class=>"form-inline"}),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
            hidden(-name=>"stock", -value=>$symbol, -override=>1),
-           "Number of Future Steps", '<input type="number" name="futureSteps" min=1 step=1>', br,
-           "Leave empty for 7 days", br,
-           submit,
+           "Number of Future Steps: ", '<input type="number" name="futureSteps" min=1 step=1>', #br,
+	   "&nbsp; &nbsp; &nbsp;", submit, br,          
+	   "<i>Leave empty for 7 days</i>", br,
         end_form;
 print   "</div>";
-# print   "</div>";
-
-print   "<div class=\"sidebar\">";
 
 
 
-print   h3("Automated Strategy");
-print   p("Shannon Ratchet");
-print   start_form({-class=>"form-inline"}),
-           hidden(-name=>"type", -value=>"plot", -override=>1),
-           hidden(-name=>"portID", -value=>$portID, -override=>1),
-           hidden(-name=>"stock", -value=>$symbol, -override=>1),
-           "Start date", '<input type="date" name="start">', br,
-           "Leave empty for earliest date for which data is available", br,
-           "End date", '<input type="date" name="end">', br,
-           "Leave empty for today", br,
-           "Initial Cash \$", '<input type="int" name="initialcash">', br,
-           "Leave empty for \$1000", br,
-           "Trade Cost \$", '<input type="int" name="tradecost">', br,
-           "Leave empty for \$3", br,
-           submit,
-        end_form;
-
-print  "<iframe id='ratchet' src='shannon_ratchet.pl?symbol=$symbol&initialcash=$initialcash&tradecost=$tradecost&start=$start&end=$end'";
-print 	"style='width=250px height=100px'></iframe>";
-
-#print   iframe({src=>"plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end",
- #           width=>"250 px" #height=>"100%"    
-  #      });
-print	"<br/><br/><br/>";
-
-print 	"<iframe id='datalist' src='plot_stock.pl?symbol=$symbol&type=text&start=$start&end=$end'";
-print	"style='width=250px height=100px'> </iframe>";
-print 	"</div>";
+print 	"</div> <!-- end container -->";
 
 
 
