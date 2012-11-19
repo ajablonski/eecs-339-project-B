@@ -59,8 +59,10 @@ for ($i=0;$i<=$#symbols;$i++) {
       
       #otherwise get the covariance
 
-        $sql = "select avg((l.$field1 - $mean_f1)*(r.$field1 - $mean)) from ".GetStockPrefix()."StocksDaily l join ";
-        $sql.= " (SELECT $field1, timestamp FROM ".GetStockPrefix()."StocksDaily WHERE symbol=rpad('DIA', 16)";
+        $sql = "select avg((l.$field1 - $mean_f1)*(r.$field1 - $mean)) from ";
+        $sql.= " (SELECT $field1, timestamp, symbol FROM ".GetStockPrefix()."StocksDaily ";
+        $sql.= " UNION SELECT $field1, timestamp, symbol FROM $netID.newstocksdaily) l join ";
+        $sql.= " (SELECT $field1, timestamp FROM ".GetStockPrefix()."StocksDaily WHERE symbol='DIA'";
         $sql.= " UNION SELECT $field1, timestamp FROM $netID.newstocksdaily WHERE symbol='DIA')";
         $sql.= " r on  l.timestamp=r.timestamp where l.symbol='$s1'";
         $sql.= " and l.timestamp>= $from" if $from;
