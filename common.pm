@@ -2,6 +2,7 @@
 package common;
 our @ISA = 'Exporter';
 our @EXPORT = qw(   $loginCookieName
+                    $covarMatrixCookieName
                     redirectIfNotLoggedIn
                     getCurrentUser
                     refreshCookies
@@ -18,6 +19,7 @@ use user;
 require "sql.pl";
 
 our $loginCookieName="portfolioLogin";
+our $covarMatrixCookieName="covMatrix";
 
 sub redirectIfNotLoggedIn {
     my $loginCookieIn = cookie($loginCookieName);

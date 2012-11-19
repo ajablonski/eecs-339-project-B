@@ -16,10 +16,138 @@ redirectIfNotLoggedIn();
 
 my @cookies = refreshCookies();
 
+####################################
+# Application logic/Data gathering #
+####################################
+
 my $action = param('act');
 my $run = param('run');
 my $portID = param('portID');
 my $error;
+
+my $start = param('start');
+if (!defined($start)) {
+    $start = "01/01/1970";
+}
+
+my $end = param('end');
+if (!defined($end)) {
+    $end = "today";
+}
+
+
+
+my @stockInfo;
+
+eval {
+    @stockInfo = ExecSQL($dbuser, $dbpasswd, "SELECT stock, numShares FROM $netID.holdings WHERE portfolioID = ?", undef, $portID);
+};
+
+
+$error = $@;
+print $error if $error;
+my @stockList;
+
+
+foreach my $row (@stockInfo) {
+    my $stock = @$row[0];
+    push(@stockList, $stock);
+}
+
+# list of all stocks in current portfolio
+my $stockArgList = join(" ", @stockList);
+
+
+# closing quote prices of all stocks in current portfolio
+my @stockQuotes = split("//", `./get_close.pl $stockArgList`);
+my %stockQuoteDict = ();
+
+# mapping closing prices to stock names
+foreach my $quote (@stockQuotes) {
+    my ($key, $val) = split("/", $quote);
+    $stockQuoteDict{$key} = $val;
+}
+
+
+my @stockCOVs = split("//", `./get_cov.pl --from='$start' --end='$end' $stockArgList`);
+#my $covdebug = `./get_cov.pl $stockArgList`;
+my %stockCOVDict = ();
+
+# mapping stock cov's (coef of variance) to stock names
+foreach my $cov (@stockCOVs) {
+    my ($key, $val) = split("/", $cov);
+    $stockCOVDict{$key} = $val;
+}
+
+
+my $doCorrCoeff = param('docorrcoeff');
+
+if (!defined($doCorrCoeff)) {
+    $doCorrCoeff = 0;
+}
+
+my @covarMatrixLines;
+my $covarMatrixCookieOut;
+my $test;
+my $covarMatrixCookieIn = cookie($covarMatrixCookieName);
+my ($oldStart, $oldEnd, $oldDoCorrCoeff, $oldMatrix);
+
+if (defined($covarMatrixCookieIn)) {
+    ($oldStart, $oldEnd, $oldDoCorrCoeff, $oldMatrix) = split("::", $covarMatrixCookieIn);
+}
+
+if (defined($covarMatrixCookieIn) and $start eq $oldStart and $end eq $oldEnd and $doCorrCoeff == $oldDoCorrCoeff) {
+    $covarMatrixCookieOut = cookie(-name=>$covarMatrixCookieName,
+            -value=>$covarMatrixCookieIn);
+    @covarMatrixLines = split("//", $oldMatrix);
+    $test =1;
+} else {
+    if ($doCorrCoeff == 1) {
+        @covarMatrixLines = split("\n", `./get_covar.pl --from='$start' --to='$end' --corrcoeff $stockArgList`); 
+    } else {
+        @covarMatrixLines = split("\n", `./get_covar.pl --from='$start' --to='$end'  $stockArgList`); 
+    }
+    $test = join("::", $start, $end, $doCorrCoeff, join("//", @covarMatrixLines));
+    $covarMatrixCookieOut = cookie(-name=>$covarMatrixCookieName,
+            -value=>$test);
+}
+
+push(@cookies, $covarMatrixCookieOut);
+
+
+
+my @portfolioInfo; # declare up here because i want to display portfolio value before listing of stocks
+
+eval {
+    @portfolioInfo = ExecSQL($dbuser, $dbpasswd, "SELECT name, cashAccount FROM $netID.portfolios where id = ?", "ROW", $portID);
+};
+
+
+my $estimatedPortValue = 0;
+
+# i realize this loop gets gone through twice in this code,
+# (later for displaying the table)
+# but i want the estimated value to display at the top of the page
+foreach my $row (@stockInfo) {
+    @$row[0] =~ s/\s+$//;
+    my $stockPrice = $stockQuoteDict{@$row[0]};
+    my $stockValue = $stockPrice * @$row[1];
+    $estimatedPortValue += $stockValue;
+}
+
+
+my @betas = split("\n", `./get_beta.pl --from='$start', --to='$end' $stockArgList`);
+
+my %stockBetaDict = ();
+
+foreach my $cov (@betas) {
+    my ($key, $val) = split(" ", $cov);
+    $stockBetaDict{$key} = $val;
+}
+
+########################
+# Form action handling #
+########################
 
 if (defined($action) and defined($run) and $run) {
     if ($action eq 'deposit') {
@@ -59,9 +187,14 @@ if (defined($action) and defined($run) and $run) {
         };
         $error = $@;
     }
+    print redirect("portfolio.pl?portID=$portID");
 }
 
-print   header(-cookies=>\@cookies),
+########################
+# HTTP/HTML generation #
+########################
+
+print   header(-cookies=>\@cookies, -expires=>"now"),
         start_html( -title=>'Portfolio View',
                     -head=>[ Link({ -rel=>"stylesheet",
                                     -href=>"http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css"}),
@@ -82,11 +215,6 @@ print   div({-class=>'navbar'},
 
 # From work done before page began
 
-my @portfolioInfo; # declare up here because i want to display portfolio value before listing of stocks
-
-eval {
-    @portfolioInfo = ExecSQL($dbuser, $dbpasswd, "SELECT name, cashAccount FROM $netID.portfolios where id = ?", "ROW", $portID);
-};
 
 $error = $@;
 print $error if $error;
@@ -98,8 +226,6 @@ print   "<div class='container'>";
 
 # Start of sidebar div
 print   div({-class=>'portfolio-actions sidebar'}, "\n",
-            #h2("Estimated portfolio present market value: ", sprintf("\$%.2f", $estimatedPortValue + $portfolioInfo[1])),
-            #h2("Total amount of cash / cash account: ", sprintf("\$%.2f", $portfolioInfo[1])),
             h3("Actions"), "\n",
 
             a({ -class=>"btn btn-info btn-small action-btn accordion-toggle",
@@ -206,65 +332,11 @@ print   div({-class=>'portfolio-actions sidebar'}, "\n",
         ), "\n\n\n"; # End portfolio actions
 
 
-my @stockInfo;
-
-eval {
-    @stockInfo = ExecSQL($dbuser, $dbpasswd, "SELECT stock, numShares FROM $netID.holdings WHERE portfolioID = ?", undef, $portID);
-};
-
-$error = $@;
-print $error if $error;
-my @stockList;
-
-
-foreach my $row (@stockInfo) {
-    my $stock = @$row[0];
-    push(@stockList, $stock);
-}
-
-# list of all stocks in current portfolio
-my $stockArgList = join(" ", @stockList);
-
-# closing quote prices of all stocks in current portfolio
-my @stockQuotes = split("//", `./get_close.pl $stockArgList`);
-my %stockQuoteDict = ();
-
-# mapping closing prices to stock names
-foreach my $quote (@stockQuotes) {
-    my ($key, $val) = split("/", $quote);
-    $stockQuoteDict{$key} = $val;
-}
-
-my @stockCOVs = split("//", `./get_cov.pl $stockArgList`);
-#my $covdebug = `./get_cov.pl $stockArgList`;
-my %stockCOVDict = ();
-
-# mapping stock cov's (coef of variance) to stock names
-foreach my $cov (@stockCOVs) {
-    my ($key, $val) = split("/", $cov);
-    $stockCOVDict{$key} = $val;
-}
-
-my $estimatedPortValue = 0;
-
-# i realize this loop gets gone through twice in this code,
-# (later for displaying the table)
-# but i want the estimated value to display at the top of the page
-foreach my $row (@stockInfo) {
-    @$row[0] =~ s/\s+$//;
-    my $stockPrice = $stockQuoteDict{@$row[0]};
-    my $stockValue = $stockPrice * @$row[1];
-    $estimatedPortValue += $stockValue;
-}
-
-
 print   "<div class='main'>", # changed from "container"
             h1("Portfolio view: $portfolioInfo[0]"), 
-	    #h2("Estimated present market value of the portfolio: "),
             h2("Total amount of cash / cash account: &nbsp;&nbsp; <font color='green'> \$", sprintf("%.2f", $portfolioInfo[1]),"</font>"),
-	    h2("Estimated portfolio present market value: <font color='green'> \$", sprintf("\$%.2f", $estimatedPortValue + $portfolioInfo[1]),"</font>"),
-            #h2("Total amount of cash / cash account: ", sprintf("\$%.2f", $portfolioInfo[1])),
-	    hr;
+            h2("Estimated portfolio present market value: <font color='green'> \$", sprintf("\%.2f", $estimatedPortValue + $portfolioInfo[1]),"</font>"),
+            hr;
 
 
 # ----- List of stock holdings -----
@@ -281,7 +353,6 @@ foreach my $row (@stockInfo) {
     @$row[0] =~ s/\s+$//;
     my $stockPrice = $stockQuoteDict{@$row[0]};
     my $stockValue = $stockPrice * @$row[1];
-    #$estimatedPortValue += $stockValue;
     print   Tr(
                 td([
                     a({href=>"stock.pl?portID=$portID&stock=@$row[0]"},
@@ -299,28 +370,13 @@ print       "</table>\n";
 print	    hr,
 	    h2("Portfolio statistics"),
             ul(
-                li(u("For all stocks:"),
-                    ul(
-                        li("Covariance/correlation matrix of the stocks in the portfolio")
-                    )
-                ),
                 li(u("For each stock:"),
                     ul(
-                        li("Coefficient of variation of each stock == The volatility of the stocks in the portfolio"),
                         li("The Beta of each stock. == The correlation of the stocks in the portfolio")
                     )
                 ),
                 br,
             );
-
-print   start_form({-class=>"form-inline"}),
-           hidden(-name=>"portID", -value=>$portID, -override=>1),
-           "Start date", '<input type="date" name="start id="portStart">', br,
-           "Leave empty for earliest date for which data is available", br,
-           "End date", '<input type="date" name="end" id="portEnd">', br,
-           "Leave empty for today", br,
-           submit,
-        end_form;
 
 # ----- List of stock holdings w/ statistics-----
 print       h2("List of Stock Holdings w/ Statistics"), "\n",
@@ -330,40 +386,58 @@ print       h2("List of Stock Holdings w/ Statistics"), "\n",
             ), "\n";
 
 
-
 foreach my $row (@stockInfo) {
     print   Tr(
                 td([
                     a({href=>"stock.pl?portID=$portID&stock=@$row[0]"},
                         @$row[0]
                     ),
-                    @$row[1]
+                    @$row[1],
+                    $stockCOVDict{@$row[0]},
+                    $stockBetaDict{@$row[0]}
                 ]),
-		td([$stockCOVDict{@$row[0]}]),
-		td(["beta"]),
-
             ), "\n";
 }
 print       "</table>\n";
-;
+
+print       hr, h2("Covariance/correlation coefficient matrix");
+
+
+print  "<table>";
+
+foreach my $line (@covarMatrixLines) {
+    print "<tr>"; 
+    foreach my $cell (split(" ", $line)) {
+        print "<td>", $cell, "</td>";
+    }
+    print "</tr>";
+}
+
+print "</table>";
+
+print "<br/><br/>"; 
+print   start_form({-class=>"form-inline"}),
+           hidden(-name=>"portID", -value=>$portID, -override=>1),
+           "Start date", '<input type="date" name="start" class="portDate">', 
+           "&nbsp; &nbsp; &nbsp; End date", '<input type="date" name="end" class="portDate">', 
+           '&nbsp; &nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="0" checked>Covariance Matrix',
+           '&nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="1">Coefficient Matrix',
+           "&nbsp; &nbsp; &nbsp;", submit, br,
+
+           "Leave start date empty for earliest date for which data is available", br,
+           "Leave end date empty for today", br
+        end_form;
 # ----- END List of stock holdings w/statistics -----
 
 
 
 print   "</div>\n"; # End main div
-print   "</div'>"; # end container div
-
-
-
-
-
+print   "</div>"; # end container div
 
 print   '<script src="http://twitter.github.com/bootstrap/assets/js/jquery.js" /> </script>', "\n",
         '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"> </script>', "\n", 
         '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"> </script>', "\n",
         '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-transition.js"> </script>';
-
-
 
 print   end_html;
 
