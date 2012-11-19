@@ -376,16 +376,20 @@ print       "</table>\n";
 # ----- END List of stock holdings -----
 
 print	    hr,
-	    h2("Portfolio statistics"),
-            ul(
-                li(u("For each stock:"),
-                    ul(
-                        li("The Beta of each stock. == The correlation of the stocks in the portfolio")
-                    )
-                ),
-                br,
-            );
+	    h1("Portfolio statistics");
 
+print   start_form({-class=>"form-inline"}),
+           hidden(-name=>"portID", -value=>$portID, -override=>1),
+           '<input type="radio" name="docorrcoeff" value="0" checked>Covariance Matrix',
+           '&nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="1">Coefficient Matrix <br/><br/> ',
+           "Start date: ", '<input type="date" name="start" class="portDate">', 
+           "&nbsp; &nbsp; &nbsp; End date: ", '<input type="date" name="end" class="portDate">', 
+
+           "&nbsp; &nbsp; &nbsp;", submit, br,
+
+           "<i>Leave start date empty for earliest date for which data is available", br,
+           "Leave end date empty for today</i>", br
+        end_form;
 # ----- List of stock holdings w/ statistics-----
 print       h2("List of Stock Holdings w/ Statistics"), "\n",
             "<table border=\"1\">\n",
@@ -424,18 +428,6 @@ foreach my $line (@covarMatrixLines) {
 print "</table>";
 
 print "<br/><br/>"; 
-print   start_form({-class=>"form-inline"}),
-           hidden(-name=>"portID", -value=>$portID, -override=>1),
-           '<input type="radio" name="docorrcoeff" value="0" checked>Covariance Matrix',
-           '&nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="1">Coefficient Matrix <br/><br/> ',
-           "Start date: ", '<input type="date" name="start" class="portDate">', 
-           "&nbsp; &nbsp; &nbsp; End date: ", '<input type="date" name="end" class="portDate">', 
-
-           "&nbsp; &nbsp; &nbsp;", submit, br,
-
-           "<i>Leave start date empty for earliest date for which data is available", br,
-           "Leave end date empty for today</i>", br
-        end_form;
 # ----- END List of stock holdings w/statistics -----
 
 
