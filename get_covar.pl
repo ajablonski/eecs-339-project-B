@@ -76,12 +76,6 @@ if ($simple && $#symbols==1) {
   }
   print "\n";
 } else {
-  if ($docorrcoeff) {
-    print "Correlation Coefficient Matrix\n";
-  } else {
-    print "Covariance Matrix\n";
-  }
-  print "Rows: $field1\nCols: $field2\n\n";
   
   print join("\t","-----",@symbols),"\n";
   
