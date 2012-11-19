@@ -41,7 +41,6 @@ require "sql.pl";
 # THIS IS FOR ILLUSTRATION PURPOSES.  IN REALITY YOU WOULD ENCRYPT THE COOKIE
 # AND CONSIDER SUPPORTING ONLY HTTPS
 #
-my $loginCookieName="portfolioLogin";
 
 #
 # Get the session input cookies, if any
