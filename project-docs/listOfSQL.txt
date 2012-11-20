@@ -1,62 +1,78 @@
+In the following sample queries, perl-style variable names are substituted for values supplied by the user/program logic, even when those values are inserted using positional binding
+$netID is the database users's username, and $StockPrefix is the prefix for class databases
+
+
 -- DQL
 
+Valid login
 SELECT COUNT(*) FROM $netID.users WHERE email = $email AND password = $password AND validation_code IS NULL 
 
+Average, standard deviation of DIA market index for finding beta
 SELECT avg($field1), stddev($field1) FROM (SELECT $field1, timestamp, symbol FROM cs339.stocksdaily UNION SELECT $field1, timestamp, symbol FROM $netID.newstocksdaily) WHERE symbol=rpad('DIA', 16)
 
+Average, standard deviation of stock whose beta is to be found
 SELECT count(*),avg($field1),stddev($field1) from (SELECT $field1 FROM $StockPrefix StocksDaily l where symbol='$s1' and l.timestamp>=$from and l.timestamp<=$to UNION SELECT $field1 FROM $netID.newstocksdaily r WHERE symbol='$s1' and r.timestamp>=$from and r.timestamp<=$to )
 
-SELECT avg((l.$field1 - $mean_f1)*(r.$field1 - $mean)) from $StockPrefix StocksDaily l join (SELECT $field1, timestamp FROM $StockPrefix StocksDaily WHERE symbol=rpad('DIA', 16) UNION SELECT $field1, timestamp FROM $netID.newstocksdaily WHERE symbol='DIA') r on  l.timestamp=r.timestamp where l.symbol='$s1' and l.timestamp>= $from and l.timestamp<= $to
+Covariance of stock against market index
+SELECT avg((l.$field1 - $mean_f1)*(r.$field1 - $mean)) from (SELECT $field1, timestamp, symbol FROM $StockPrefix.StocksDaily UNION SELECT $field1, timestamp, symbol FROM $netID.newstocksdaily) l join (SELECT $field1, timestamp FROM $StockPrefix StocksDaily WHERE symbol='DIA' UNION SELECT $field1, timestamp FROM $netID.newstocksdaily WHERE symbol='DIA') r on  l.timestamp=r.timestamp where l.symbol='$s1' and l.timestamp>= $from and l.timestamp<= $to
 
+Coefficient of variation of stock
 SELECT stddev($field) / avg($field) FROM (SELECT $field FROM ".GetStockPrefix()."StocksDaily WHERE symbol='$symbol' AND timestamp>=$from AND timestamp<=$to UNION  SELECT $field FROM $netID.newstocksdaily WHERE symbol='$symbol' AND timestamp>=$from AND timestamp<=$to )
 
-SELECT count(*),avg(l.$field1),stddev(l.$field1),avg(r.$field2),stddev(r.$field2) from $StockPrefix StocksDaily l join $StockPrefix StocksDaily r on l.timestamp= r.timestamp where l.symbol='$s1' and r.symbol='$s2' and l.timestamp>=$from and l.timestamp<=$to
+Averages, standard deviations of stocks for covariance
+SELECT count(*),avg(l.$field1),stddev(l.$field1),avg(r.$field2),stddev(r.$field2) from (SELECT $field1, timestamp, symbol FROM $StockPrefix.StocksDaily UNION SELECT $field1, timestamp, symbol FROM $netID.newstocksdaily ) l join (SELECT $field2, timestamp, symbol FROM $StockPrefix.StocksDaily  UNION SELECT $field2, timestamp, symbol FROM $netID.newstocksdaily ) r on l.timestamp= r.timestamp where l.symbol='$s1' and r.symbol='$s2' and l.timestamp>=$from and l.timestamp<=$to
 
+Covariance of two stocks
 SELECT avg((l.$field1 - $mean_f1)*(r.$field2 - $mean_f2)) from $StockPrefix StocksDaily l join $StockPrefix StocksDaily r on l.timestamp=r.timestamp where l.symbol='$s1' and r.symbol='$s2' and l.timestamp>= $from and l.timestamp<= $to"
 
+Select given fields (in $joinedFields, where $joinedInnerFields always
+includes timestamp) of stock information
 SELECT $joinedFields FROM (select $joinedInnerFields from $StockPrefix StocksDaily where symbol = '$symbol' and timestamp >= $from and timestamp <= $to UNION SELECT $joinedInnerFields FROM $netID.newstocksdaily where symbol = '$symbol' and timestamp >= $from and timestamp <= $to) order by timestamp
 
-SELECT id, name, cashAccount FROM $netID.portfolios WHERE owner = $currentUser
+Select all portfolios for a given user
+SELECT id, name, cashccount FROM $netID.portfolios WHERE owner = $currentUser
 
-SELECT COUNT(*) FROM $netID.users WHERE email = $email AND password = $password AND validation_code IS NULL
+Get data for a stock over a specific range
+SELECT timestamp, close FROM $StockPrefix StocksDaily WHERE symbol=$symbol AND timestamp BETWEEN $start AND $end UNION SELECT timestamp, close FROM $netID.newstocksdaily WHERE symbol=$symbol AND timestamp BETWEEN $start AND $end
 
-SELECT timestamp, close FROM $StockPrefix StocksDaily WHERE symbol=rpad(:1,16) AND timestamp BETWEEN :2 AND :3 UNION SELECT timestamp, close FROM $netID.newstocksdaily WHERE symbol=rpad(:1,16) AND timestamp BETWEEN :2 AND :3
-
+Get all holdings in a particular portfolio
 SELECT stock, numShares FROM $netID.holdings WHERE portfolioID = $portID
 
+Get name and cash account value of a portfolio
 SELECT name, cashAccount FROM $netID.portfolios where id = $portID
 
+Get list of all stocks, for quote.pl called by quote_daemon
 SELECT DISTINCT stock FROM $netID.holdings
 
+Get number of shares of a stock
 SELECT numShares FROM $netID.holdings WHERE portfolioID = $portID AND stock = rpad($symbol, 16)
-
-SELECT numShares FROM $netID.holdings WHERE portfolioID = $portID AND stock = rpad($symbol, 16) 
 
 -- DML
 
+Remove portfolio
 DELETE FROM $netID.portfolios WHERE id = $portID
 
+Add new portfolio (trigger creates unique id)
 INSERT INTO $netID.portfolios (name, owner, cashAccount) VALUES ($name, $currentUser, 0)
 
+Confirm/activate user (user may only log in when validation code is null)
 UPDATE $netID.users SET validation_code=NULL WHERE validation_code = $key
 
+Deposit money
 UPDATE $netID.portfolios SET cashAccount = cashAccount + $amount WHERE id = $portID
 
+Withdraw money
 UPDATE $netID.portfolios SET cashAccount = cashAccount - $amount WHERE id = $portID
 
-INSERT INTO $netID.newstocksdaily (symbol, timestamp, high, low, open, close, volume) VALUES ($dbuser, $dbpasswd, $sqlString, undef, $stock, str2time($date), $high, $low, $open, $close, $volume)
-
+Add new stock data
 INSERT INTO $netID.newstocksdaily (symbol, timestamp, high, low, close, open, volume) VALUES($symbol, $timestamp, $high, $low, $close, $open, $volume)
 
-UPDATE $netID.newstocksdaily SET high=$high, low=$low, open=$open, close=$close, volume=$volume WHERE symbol=$symbol AND timestamp=$timestamp
-
+Sell all of currently owned stock
 DELETE FROM $netID.holdings WHERE portfolioID = $portID AND stock = $stock
 
-UPDATE $netID.portfolios SET cashAccount = cashAccount + $amount WHERE id = $portID
-
-DELETE FROM $netID.holdings WHERE portfolioID = $portID AND stock = rpad($symbol, 16)
-
+Buy more or sell some (not all) of a stock holding
 UPDATE $netID.holdings SET numShares = numShares + $numShares WHERE portfolioID = $portID AND stock = rpad(?, 16)
 	
+Buy previously unowned stock    
 INSERT INTO $netID.holdings (portfolioID, stock, numShares) VALUES ($portID, $stock, $numShares)
 
