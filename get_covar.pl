@@ -5,7 +5,7 @@
 use Getopt::Long;
 use Time::ParseDate;
 use FileHandle;
-
+use user;
 use stock_data_access;
 
 $close=1;
@@ -38,7 +38,13 @@ for ($i=0;$i<=$#symbols;$i++) {
     
 #first, get means and vars for the individual columns that match
     
-    $sql = "select count(*),avg(l.$field1),stddev(l.$field1),avg(r.$field2),stddev(r.$field2) from ".GetStockPrefix()."StocksDaily l join ".GetStockPrefix()."StocksDaily r on l.timestamp= r.timestamp where l.symbol='$s1' and r.symbol='$s2'";
+    $sql = "select count(*),avg(l.$field1),stddev(l.$field1),avg(r.$field2),stddev(r.$field2) from ";
+    $sql.= " (SELECT $field1, timestamp, symbol FROM ".GetStockPrefix()."StocksDaily ";
+    $sql.= " UNION SELECT $field1, timestamp, symbol FROM $netID.newstocksdaily ) l ";
+    $sql.= " join ";
+    $sql.= " (SELECT $field2, timestamp, symbol FROM ".GetStockPrefix()."StocksDaily ";
+    $sql.= " UNION SELECT $field2, timestamp, symbol FROM $netID.newstocksdaily ) r ";
+    $sql.= " on l.timestamp= r.timestamp where l.symbol='$s1' and r.symbol='$s2'";
     $sql.= " and l.timestamp>=$from" if $from;
     $sql.= " and l.timestamp<=$to" if $to;
     
@@ -53,9 +59,15 @@ for ($i=0;$i<=$#symbols;$i++) {
       
       #otherwise get the covariance
 
-      $sql = "select avg((l.$field1 - $mean_f1)*(r.$field2 - $mean_f2)) from ".GetStockPrefix()."StocksDaily l join ".GetStockPrefix()."StocksDaily r on  l.timestamp=r.timestamp where l.symbol='$s1' and r.symbol='$s2'";
-      $sql.= " and l.timestamp>= $from" if $from;
-      $sql.= " and l.timestamp<= $to" if $to;
+        $sql = "select avg((l.$field1 - $mean_f1)*(r.$field2 - $mean_f2)) from ";
+        $sql.= " (SELECT $field1, timestamp, symbol FROM ".GetStockPrefix()."StocksDaily ";
+        $sql.= " UNION SELECT $field1, timestamp, symbol FROM $netID.newstocksdaily ) l ";
+        $sql.= " join ";
+        $sql.= " (SELECT $field2, timestamp, symbol FROM ".GetStockPrefix()."StocksDaily ";
+        $sql.= " UNION SELECT $field2, timestamp, symbol FROM $netID.newstocksdaily ) r ";
+        $sql.= " on  l.timestamp=r.timestamp where l.symbol='$s1' and r.symbol='$s2'";
+        $sql.= " and l.timestamp>= $from" if $from;
+        $sql.= " and l.timestamp<= $to" if $to;
 
       ($covar{$s1}{$s2}) = ExecStockSQL("ROW",$sql);
 
