@@ -88,7 +88,6 @@ if (!defined($doCorrCoeff)) {
 
 my @covarMatrixLines;
 my $covarMatrixCookieOut;
-my $test;
 my $covarMatrixCookieIn = cookie($covarMatrixCookieName);
 my ($oldStart, $oldEnd, $oldDoCorrCoeff, $oldPortID, $oldMatrix);
 
@@ -100,16 +99,15 @@ if (defined($covarMatrixCookieIn) and $portID == $oldPortID and $start eq $oldSt
     $covarMatrixCookieOut = cookie(-name=>$covarMatrixCookieName,
             -value=>$covarMatrixCookieIn);
     @covarMatrixLines = split("//", $oldMatrix);
-    $test =1;
 } else {
     if ($doCorrCoeff == 1) {
         @covarMatrixLines = split("\n", `./get_covar.pl --from='$start' --to='$end' --corrcoeff $stockArgList`); 
     } else {
         @covarMatrixLines = split("\n", `./get_covar.pl --from='$start' --to='$end'  $stockArgList`); 
     }
-    $test = join("::", $start, $end, $doCorrCoeff, $portID, join("//", @covarMatrixLines));
+    my $data = join("::", $start, $end, $doCorrCoeff, $portID, join("//", @covarMatrixLines));
     $covarMatrixCookieOut = cookie(-name=>$covarMatrixCookieName,
-            -value=>$test);
+            -value=>$data);
 }
 
 push(@cookies, $covarMatrixCookieOut);
@@ -150,6 +148,8 @@ foreach my $cov (@betas) {
 ########################
 
 if (defined($action) and defined($run) and $run) {
+
+    my $resetCovar = 0;
     if ($action eq 'deposit') {
         my $amount = param('amount');
         eval {
@@ -170,6 +170,7 @@ if (defined($action) and defined($run) and $run) {
         eval {
             BuySellStock($dbuser, $dbpasswd, $shares, $stock, $price, $portID);
         };
+        $resetCovar = 1;
         $error = $@;
     } elsif ($action eq 'addData') {
         my $high = param('high');
@@ -187,7 +188,9 @@ if (defined($action) and defined($run) and $run) {
         };
         $error = $@;
     }
-    print redirect("portfolio.pl?portID=$portID");
+    my @outCookies = refreshCookies();
+    push(@outCookies, cookie(-name=>$covarMatrixCookieName, -expires=>'-1h', -value=>'0')) if $resetCovar;
+    print redirect(-uri=>"portfolio.pl?portID=$portID", -cookie=>\@outCookies);
 }
 
 ########################
