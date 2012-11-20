@@ -46,12 +46,10 @@ sub ExecSQL {
         $sth->finish();
         if ($debug) {push @sqloutput, MakeTable("debug_sqloutput","ROW",undef,@data);}
         $dbh->disconnect();
-        SQLdebug("Row", @data);
         return @data;
     }
     my @ret;
-    while (@data=$sth->fetchrow_array()) {
-        SQLdebug("undef", @data);
+    while ($type ne "NOTHING" and @data=$sth->fetchrow_array()) {
         push @ret, [@data];
     }
     if (defined $type and $type eq "COL") { 
@@ -59,13 +57,11 @@ sub ExecSQL {
         $sth->finish();
         if ($debug) {push @sqloutput, MakeTable("debug_sqloutput","COL",undef,@data);}
         $dbh->disconnect();
-        SQLdebug("COL", @data);
         return @data;
     }
     $sth->finish();
     if ($debug) {push @sqloutput, MakeTable("debug_sql_output","2D",undef,@ret);}
     $dbh->disconnect();
-    SQLdebug(@ret);
     return @ret;
 }
 

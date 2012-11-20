@@ -151,7 +151,7 @@ print   img({src=>"plot_future_price.pl?symbol=$symbol&type=plot&futureSteps=$fu
 print   start_form({-class=>"form-inline"}),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
            hidden(-name=>"stock", -value=>$symbol, -override=>1),
-           "Number of Future Steps: ", '<input type="number" name="futureSteps" min=1 step=1>', #br,
+           "Number of Future Steps (days): ", '<input type="number" name="futureSteps" min=1 step=1>', #br,
 	   "&nbsp; &nbsp; &nbsp;", submit, br,          
 	   "<i>Leave empty for 7 days</i>", br,
         end_form;

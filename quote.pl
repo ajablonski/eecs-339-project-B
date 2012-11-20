@@ -59,7 +59,7 @@ foreach $symbol (@symbols) {
     $symbol =~ s/\s+$//;
     if (defined($quotes{$symbol,"success"}) and $recordOK) { 
         eval {
-            ExecSQL($dbuser, $dbpasswd, $insertSQLstring, undef, 
+            ExecSQL($dbuser, $dbpasswd, $insertSQLstring, "NOTHING", 
                 $symbol,
                 str2time($quotes{$symbol, "date"}),
                 $quotes{$symbol, "high"},
