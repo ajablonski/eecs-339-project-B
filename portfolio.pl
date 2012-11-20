@@ -90,13 +90,13 @@ my @covarMatrixLines;
 my $covarMatrixCookieOut;
 my $test;
 my $covarMatrixCookieIn = cookie($covarMatrixCookieName);
-my ($oldStart, $oldEnd, $oldDoCorrCoeff, $oldMatrix);
+my ($oldStart, $oldEnd, $oldDoCorrCoeff, $oldPortID, $oldMatrix);
 
 if (defined($covarMatrixCookieIn)) {
-    ($oldStart, $oldEnd, $oldDoCorrCoeff, $oldMatrix) = split("::", $covarMatrixCookieIn);
+    ($oldStart, $oldEnd, $oldDoCorrCoeff, $oldPortID, $oldMatrix) = split("::", $covarMatrixCookieIn);
 }
 
-if (defined($covarMatrixCookieIn) and $start eq $oldStart and $end eq $oldEnd and $doCorrCoeff == $oldDoCorrCoeff) {
+if (defined($covarMatrixCookieIn) and $portID == $oldPortID and $start eq $oldStart and $end eq $oldEnd and $doCorrCoeff == $oldDoCorrCoeff) {
     $covarMatrixCookieOut = cookie(-name=>$covarMatrixCookieName,
             -value=>$covarMatrixCookieIn);
     @covarMatrixLines = split("//", $oldMatrix);
@@ -107,7 +107,7 @@ if (defined($covarMatrixCookieIn) and $start eq $oldStart and $end eq $oldEnd an
     } else {
         @covarMatrixLines = split("\n", `./get_covar.pl --from='$start' --to='$end'  $stockArgList`); 
     }
-    $test = join("::", $start, $end, $doCorrCoeff, join("//", @covarMatrixLines));
+    $test = join("::", $start, $end, $doCorrCoeff, $portID, join("//", @covarMatrixLines));
     $covarMatrixCookieOut = cookie(-name=>$covarMatrixCookieName,
             -value=>$test);
 }
@@ -342,7 +342,7 @@ print "</div> <!-- end sidebar div -->";
 
 print   "<div class='main'>", 
             h1("Portfolio view: $portfolioInfo[0]"), 
-            h2("Total amount of cash / cash account: &nbsp;&nbsp; <font color='green'> \$", sprintf("%.2f", $portfolioInfo[1]),"</font>"),
+            h2("Total amount of cash (cash account): &nbsp;&nbsp; <font color='green'> \$", sprintf("%.2f", $portfolioInfo[1]),"</font>"),
             h2("Estimated portfolio present market value: <font color='green'> \$", sprintf("\%.2f", $estimatedPortValue + $portfolioInfo[1]),"</font>"),
             hr;
 
@@ -381,7 +381,7 @@ print	    hr,
 print   start_form({-class=>"form-inline"}),
            hidden(-name=>"portID", -value=>$portID, -override=>1),
            '<input type="radio" name="docorrcoeff" value="0" checked>Covariance Matrix',
-           '&nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="1">Coefficient Matrix <br/><br/> ',
+           '&nbsp; &nbsp; <input type="radio" name="docorrcoeff" value="1">Correlation Coefficient Matrix <br/><br/> ',
            "Start date: ", '<input type="date" name="start" class="portDate">', 
            "&nbsp; &nbsp; &nbsp; End date: ", '<input type="date" name="end" class="portDate">', 
 
